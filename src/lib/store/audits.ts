@@ -2,27 +2,32 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import type { AuditListItem, CompareResult, ProAuditResult } from "@/lib/seo/proTypes";
+import { dataDir, ensureDataDir, readJsonFile, writeJsonFile } from "./paths";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const AUDITS_DIR = path.join(DATA_DIR, "audits");
-const INDEX_FILE = path.join(DATA_DIR, "index.json");
-const COMPARE_DIR = path.join(DATA_DIR, "compares");
+function auditsDir() {
+  return path.join(dataDir(), "audits");
+}
+function compareDir() {
+  return path.join(dataDir(), "compares");
+}
+function indexFile() {
+  return path.join(dataDir(), "index.json");
+}
 
 async function ensureDirs() {
-  await fs.mkdir(AUDITS_DIR, { recursive: true });
-  await fs.mkdir(COMPARE_DIR, { recursive: true });
+  await ensureDataDir("audits", "compares");
+  const idx = indexFile();
   try {
-    await fs.access(INDEX_FILE);
+    await fs.access(idx);
   } catch {
-    await fs.writeFile(INDEX_FILE, "[]", "utf8");
+    await writeJsonFile(idx, []);
   }
 }
 
 async function readIndex(): Promise<AuditListItem[]> {
-  await ensureDirs();
-  const raw = await fs.readFile(INDEX_FILE, "utf8");
   try {
-    return JSON.parse(raw) as AuditListItem[];
+    await ensureDirs();
+    return await readJsonFile<AuditListItem[]>(indexFile(), []);
   } catch {
     return [];
   }
@@ -30,7 +35,7 @@ async function readIndex(): Promise<AuditListItem[]> {
 
 async function writeIndex(items: AuditListItem[]) {
   await ensureDirs();
-  await fs.writeFile(INDEX_FILE, JSON.stringify(items, null, 2), "utf8");
+  await writeJsonFile(indexFile(), items);
 }
 
 export async function saveAudit(audit: Omit<ProAuditResult, "id"> & { id?: string }): Promise<ProAuditResult> {
@@ -38,7 +43,7 @@ export async function saveAudit(audit: Omit<ProAuditResult, "id"> & { id?: strin
   const id = audit.id || randomUUID();
   const full: ProAuditResult = { ...audit, id };
 
-  await fs.writeFile(path.join(AUDITS_DIR, `${id}.json`), JSON.stringify(full, null, 2), "utf8");
+  await writeJsonFile(path.join(auditsDir(), `${id}.json`), full);
 
   const index = await readIndex();
   const item: AuditListItem = {
@@ -60,9 +65,9 @@ export async function listAudits(): Promise<AuditListItem[]> {
 }
 
 export async function getAudit(id: string): Promise<ProAuditResult | null> {
-  await ensureDirs();
   try {
-    const raw = await fs.readFile(path.join(AUDITS_DIR, `${id}.json`), "utf8");
+    await ensureDirs();
+    const raw = await fs.readFile(path.join(auditsDir(), `${id}.json`), "utf8");
     return JSON.parse(raw) as ProAuditResult;
   } catch {
     return null;
@@ -70,14 +75,18 @@ export async function getAudit(id: string): Promise<ProAuditResult | null> {
 }
 
 export async function deleteAudit(id: string): Promise<boolean> {
-  await ensureDirs();
   try {
-    await fs.unlink(path.join(AUDITS_DIR, `${id}.json`));
+    await ensureDirs();
+    try {
+      await fs.unlink(path.join(auditsDir(), `${id}.json`));
+    } catch {
+      // ignore missing file
+    }
+    const index = await readIndex();
+    await writeIndex(index.filter((x) => x.id !== id));
   } catch {
-    // ignore missing file
+    // ignore persistence errors on read-only hosts
   }
-  const index = await readIndex();
-  await writeIndex(index.filter((x) => x.id !== id));
   return true;
 }
 
@@ -89,14 +98,14 @@ export async function saveCompare(compare: Omit<CompareResult, "id" | "createdAt
     id,
     createdAt: new Date().toISOString(),
   };
-  await fs.writeFile(path.join(COMPARE_DIR, `${id}.json`), JSON.stringify(full, null, 2), "utf8");
+  await writeJsonFile(path.join(compareDir(), `${id}.json`), full);
   return full;
 }
 
 export async function getCompare(id: string): Promise<CompareResult | null> {
-  await ensureDirs();
   try {
-    const raw = await fs.readFile(path.join(COMPARE_DIR, `${id}.json`), "utf8");
+    await ensureDirs();
+    const raw = await fs.readFile(path.join(compareDir(), `${id}.json`), "utf8");
     return JSON.parse(raw) as CompareResult;
   } catch {
     return null;

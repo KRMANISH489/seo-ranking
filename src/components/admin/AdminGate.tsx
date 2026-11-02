@@ -14,7 +14,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     async function check() {
       try {
-        const res = await fetch("/api/admin/me");
+        const res = await fetch("/api/admin/me", { cache: "no-store" });
         if (!res.ok) {
           router.replace(`/admin/login?next=${encodeURIComponent(pathname)}`);
           return;

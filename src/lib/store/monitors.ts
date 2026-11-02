@@ -1,6 +1,6 @@
-import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { dataDir, ensureDataDir, readJsonFile, writeJsonFile } from "./paths";
 
 export interface MonitorSite {
   id: string;
@@ -19,22 +19,23 @@ export interface MonitorSite {
   notes?: string;
 }
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const FILE = path.join(DATA_DIR, "monitors.json");
+function filePath() {
+  return path.join(dataDir(), "monitors.json");
+}
 
 async function ensure() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  try {
-    await fs.access(FILE);
-  } catch {
-    await fs.writeFile(FILE, "[]", "utf8");
+  await ensureDataDir();
+  const file = filePath();
+  const existing = await readJsonFile<MonitorSite[] | null>(file, null);
+  if (existing === null) {
+    await writeJsonFile(file, []);
   }
 }
 
 async function readAll(): Promise<MonitorSite[]> {
-  await ensure();
   try {
-    return JSON.parse(await fs.readFile(FILE, "utf8")) as MonitorSite[];
+    await ensure();
+    return await readJsonFile<MonitorSite[]>(filePath(), []);
   } catch {
     return [];
   }
@@ -42,7 +43,7 @@ async function readAll(): Promise<MonitorSite[]> {
 
 async function writeAll(items: MonitorSite[]) {
   await ensure();
-  await fs.writeFile(FILE, JSON.stringify(items, null, 2), "utf8");
+  await writeJsonFile(filePath(), items);
 }
 
 export async function listMonitors(): Promise<MonitorSite[]> {

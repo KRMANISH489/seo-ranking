@@ -31,12 +31,18 @@ function DashboardInner() {
   const [cronMsg, setCronMsg] = useState<string | null>(null);
 
   async function load() {
-    const res = await fetch("/api/admin/stats");
-    if (!res.ok) {
+    try {
+      const res = await fetch("/api/admin/stats", { cache: "no-store" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(typeof data.error === "string" ? data.error : "Could not load dashboard");
+        return;
+      }
+      setError(null);
+      setStats(data);
+    } catch {
       setError("Could not load dashboard");
-      return;
     }
-    setStats(await res.json());
   }
 
   useEffect(() => {
