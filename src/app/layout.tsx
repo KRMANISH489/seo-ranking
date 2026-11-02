@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   description:
     "CodAbhi professional SEO audits with Gemini strategy, live Google rank, weekly client emails, PDF reports, and admin panel.",
   applicationName: "CodAbhi SEO",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-32.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -27,11 +34,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${dmSans.variable} ${syne.variable} h-full antialiased`}
     >
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
-      </head>
       <body className="min-h-full flex flex-col">
         <Suspense fallback={<div className="h-14 border-b border-[var(--line)]" />}>
           <AppNav />
