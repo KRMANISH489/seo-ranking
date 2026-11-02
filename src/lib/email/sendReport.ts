@@ -6,11 +6,16 @@ function getAdminEmail(): string | null {
   return process.env.ADMIN_EMAIL?.trim() || null;
 }
 
+function smtpPass(): string {
+  // Gmail App Passwords are often copied with spaces
+  return (process.env.SMTP_PASS || "").replace(/\s+/g, "");
+}
+
 function isEmailConfigured(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
       process.env.SMTP_USER?.trim() &&
-      process.env.SMTP_PASS?.trim() &&
+      smtpPass() &&
       process.env.SMTP_FROM?.trim()
   );
 }
@@ -22,8 +27,8 @@ function transporter() {
     port,
     secure: port === 465,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.SMTP_USER?.trim(),
+      pass: smtpPass(),
     },
   });
 }
@@ -194,6 +199,31 @@ export function emailStatus() {
   return {
     smtpConfigured: isEmailConfigured(),
     adminEmail: getAdminEmail(),
+    smtpUser: process.env.SMTP_USER?.trim() || null,
     serpConfigured: Boolean(process.env.SERPER_API_KEY || process.env.SERPAPI_KEY),
   };
+}
+
+export async function sendTestEmail(to: string): Promise<{ ok: boolean; error: string | null }> {
+  if (!isEmailConfigured()) {
+    return {
+      ok: false,
+      error: "SMTP not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM.",
+    };
+  }
+  try {
+    const tx = transporter();
+    await tx.sendMail({
+      from: process.env.SMTP_FROM,
+      to,
+      subject: "CodAbhi SEO — test email OK",
+      html: `<div style="font-family:Arial,sans-serif;padding:20px;background:#0b1117;color:#f4f7fb">
+        <h2 style="color:#22d3ee">CodAbhi SEO</h2>
+        <p>SMTP is working. Audit reports can now email client + admin.</p>
+      </div>`,
+    });
+    return { ok: true, error: null };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Send failed" };
+  }
 }

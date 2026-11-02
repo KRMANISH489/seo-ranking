@@ -7,8 +7,11 @@ function SettingsInner() {
   const [status, setStatus] = useState<{
     smtpConfigured?: boolean;
     adminEmail?: string | null;
+    smtpUser?: string | null;
     serpConfigured?: boolean;
   }>({});
+  const [testMsg, setTestMsg] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
 
   useEffect(() => {
     fetch("/api/monitors")
@@ -17,11 +20,26 @@ function SettingsInner() {
       .catch(() => undefined);
   }, []);
 
+  async function sendTest() {
+    setTesting(true);
+    setTestMsg(null);
+    try {
+      const res = await fetch("/api/admin/test-email", { method: "POST", body: "{}" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Test failed");
+      setTestMsg(`Test email sent to ${data.to}`);
+    } catch (err) {
+      setTestMsg(err instanceof Error ? err.message : "Test failed");
+    } finally {
+      setTesting(false);
+    }
+  }
+
   const rows = [
     {
       name: "Gemini AI",
       ok: true,
-      hint: "GEMINI_API_KEY in .env.local",
+      hint: "GEMINI_API_KEY in .env.local / Vercel",
     },
     {
       name: "Google rank (Serper)",
@@ -31,7 +49,9 @@ function SettingsInner() {
     {
       name: "SMTP email",
       ok: Boolean(status.smtpConfigured),
-      hint: "SMTP_HOST / USER / PASS / FROM",
+      hint: status.smtpUser
+        ? `From ${status.smtpUser}`
+        : "Set SMTP_HOST / USER / PASS / FROM",
     },
     {
       name: "Admin email CC",
@@ -41,7 +61,7 @@ function SettingsInner() {
     {
       name: "Weekly cron",
       ok: true,
-      hint: "Vercel cron Mon 09:00 UTC · or /api/cron/weekly",
+      hint: "Vercel cron Mon 09:00 UTC · or Run weekly on Dashboard",
     },
   ];
 
@@ -49,7 +69,8 @@ function SettingsInner() {
     <div>
       <h1 className="font-display text-3xl font-bold tracking-tight">Backend settings</h1>
       <p className="mt-1 text-sm text-[var(--muted)]">
-        Config is managed via <code className="text-[var(--accent)]">.env.local</code> (secure, not in UI).
+        Config via <code className="text-[var(--accent)]">.env.local</code> (local) or Vercel Environment
+        Variables (production).
       </p>
 
       <div className="mt-6 space-y-3">
@@ -70,20 +91,55 @@ function SettingsInner() {
         ))}
       </div>
 
-      <div className="glass mt-8 rounded-2xl p-5 text-sm text-[var(--muted)]">
-        <p className="font-medium text-[var(--text)]">Admin login password</p>
-        <p className="mt-2">
-          Uses <code className="text-[var(--accent)]">ADMIN_PASSWORD</code> if set, otherwise{" "}
-          <code className="text-[var(--accent)]">ADMIN_SECRET</code>. Current local default was set in{" "}
-          <code>.env.local</code>.
-        </p>
-        <p className="mt-4 font-medium text-[var(--text)]">API backend routes</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>/api/analyze — public audit + enroll monitor</li>
-          <li>/api/admin/* — login, stats, session</li>
-          <li>/api/monitors — client monitor CRUD</li>
-          <li>/api/cron/weekly — weekly batch emails</li>
-        </ul>
+      <div className="glass mt-8 space-y-4 rounded-2xl p-5 text-sm text-[var(--muted)]">
+        <p className="font-medium text-[var(--text)]">Gmail SMTP setup (email reports)</p>
+        <ol className="list-decimal space-y-2 pl-5">
+          <li>
+            Google Account →{" "}
+            <a
+              href="https://myaccount.google.com/security"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[var(--accent)] hover:underline"
+            >
+              Security
+            </a>{" "}
+            → turn on <strong className="text-[var(--text)]">2-Step Verification</strong>
+          </li>
+          <li>
+            Open{" "}
+            <a
+              href="https://myaccount.google.com/apppasswords"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[var(--accent)] hover:underline"
+            >
+              App Passwords
+            </a>{" "}
+            → create for “Mail” → copy 16-char password
+          </li>
+          <li>
+            Set env: <code className="text-[var(--accent)]">SMTP_PASS</code> = that password (spaces OK)
+          </li>
+          <li>
+            Also set <code className="text-[var(--accent)]">SMTP_HOST=smtp.gmail.com</code>,{" "}
+            <code className="text-[var(--accent)]">SMTP_PORT=587</code>,{" "}
+            <code className="text-[var(--accent)]">SMTP_USER</code>,{" "}
+            <code className="text-[var(--accent)]">SMTP_FROM</code>,{" "}
+            <code className="text-[var(--accent)]">ADMIN_EMAIL</code>
+          </li>
+          <li>Vercel pe same keys add karke <strong className="text-[var(--text)]">Redeploy</strong></li>
+        </ol>
+
+        <button
+          type="button"
+          onClick={sendTest}
+          disabled={testing}
+          className="btn-brand rounded-xl px-4 py-2.5 text-sm disabled:opacity-50"
+        >
+          {testing ? "Sending…" : "Send test email to admin"}
+        </button>
+        {testMsg && <p className="text-[var(--text)]">{testMsg}</p>}
       </div>
     </div>
   );
