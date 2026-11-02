@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RankScope Pro — SEO + Weekly Rank Emails
 
-## Getting Started
+Professional SEO platform with Gemini strategy, live Google rankings, weekly auto-audits, and email reports to **client + admin**.
 
-First, run the development server:
+## What it does
+
+1. Collects **URL + client email + target keywords**
+2. Runs full SEO audit + **real Google rank positions**
+3. Emails report to **client and ADMIN_EMAIL**
+4. Saves a **weekly monitor** (stays ON until admin pauses)
+5. Cron `/api/cron/weekly` re-checks every week and re-mails both
+
+## Setup
+
+```bash
+cd seo-analyzer
+npm install
+cp .env.example .env.local
+```
+
+### Required for full power
+
+| Env | Purpose |
+|-----|---------|
+| `GEMINI_API_KEY` | AI SEO strategist |
+| `SERPER_API_KEY` | Live Google ranks ([serper.dev](https://serper.dev)) |
+| `SMTP_*` + `ADMIN_EMAIL` | Email client + admin |
+| `CRON_SECRET` / `ADMIN_SECRET` | Protect cron + monitors admin |
+| `APP_BASE_URL` | Links inside emails |
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Weekly automation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Vercel:** `vercel.json` runs Monday 09:00 UTC → `/api/cron/weekly`
+- **Manual / external cron:**  
+  `GET/POST /api/cron/weekly?secret=YOUR_CRON_SECRET`
+- **Admin UI:** `/monitors` → Pause / Resume / Run now / Run weekly now
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Admin panel (backend)
 
-## Learn More
+| Path | Purpose |
+|------|---------|
+| `/admin/login` | Admin login |
+| `/admin` | Dashboard (stats, run weekly) |
+| `/admin/clients` | Pause/resume/run client monitors |
+| `/admin/audits` | All saved reports |
+| `/admin/settings` | System status |
 
-To learn more about Next.js, take a look at the following resources:
+Login password = `ADMIN_PASSWORD` (or `ADMIN_SECRET`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Path | Purpose |
+|------|---------|
+| `/` | Audit + enroll weekly monitor |
+| `/admin` | Backend admin panel |
+| `/compare` | Competitor compare |
+| `/history` | Saved audits |
+| `/report/[id]` | Full report |
+| `/api/cron/weekly` | Weekly job |
+| `/api/admin/*` | Admin auth + stats APIs |
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Google rank needs a SERP API key (Serper or SerpAPI). Without it, audits still work; rank shows setup hint.
+- Email needs SMTP (Gmail App Password works well).
+- Monitoring continues until admin pauses/deletes the monitor.

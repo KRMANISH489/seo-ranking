@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#0a0a0f"/>
+  <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="rgba(255,255,255,0.1)"/>
+  <path d="M4 4H8V8H4V4Z" stroke="#22d3ee" stroke-width="1.5" opacity="0.8"/>
+  <path d="M28 28H24V24H28V28Z" stroke="#a78bfa" stroke-width="1.5" opacity="0.8"/>
+  <text x="11" y="21" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#22d3ee">C</text>
+  <text x="19" y="21" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#a78bfa">A</text>
+</svg>
