@@ -127,11 +127,12 @@ export default function Home() {
               <div className="relative overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--bg)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/seo-dashboard.svg"
+                  src="/seo-dashboard.jpg"
                   alt="CodAbhi SEO automated audit dashboard with weekly Google rank monitoring and client report delivery"
                   width={960}
                   height={540}
                   className="h-auto w-full"
+                  decoding="async"
                 />
               </div>
             </section>
