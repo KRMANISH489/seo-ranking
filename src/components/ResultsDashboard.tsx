@@ -164,7 +164,7 @@ export function ResultsDashboard({ result }: { result: ProAuditResult }) {
       </Section>
 
       {(result.clientEmail || result.emailDelivery) && (
-        <Section title="Email delivery" subtitle="Reports to client and admin.">
+        <Section title="Email delivery" subtitle="Weekly reports to the client inbox (and your agency mailbox).">
           <div className="space-y-2 text-sm">
             {result.clientEmail ? (
               <p>

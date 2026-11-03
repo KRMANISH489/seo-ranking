@@ -8,7 +8,7 @@ const links = [
   { href: "/", label: "Audit" },
   { href: "/compare", label: "Compete" },
   { href: "/history", label: "History" },
-  { href: "/admin", label: "Admin" },
+  { href: "/admin", label: "Dashboard" },
 ];
 
 export function AppNav() {

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">CodAbhi SEO automated audit and weekly Google rank monitoring dashboard</title>
+  <desc id="desc">Illustration of an automated SEO audit tool showing score rings, keyword rank tracking, and weekly client report delivery</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1117"/>
+      <stop offset="55%" stop-color="#15202b"/>
+      <stop offset="100%" stop-color="#1a1030"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="24" fill="url(#bg)"/>
+  <rect x="48" y="48" width="864" height="72" rx="16" fill="#101820" stroke="rgba(148,163,184,0.2)"/>
+  <circle cx="88" cy="84" r="16" fill="url(#accent)"/>
+  <rect x="120" y="72" width="220" height="14" rx="7" fill="#22d3ee" opacity="0.9"/>
+  <rect x="120" y="94" width="140" height="10" rx="5" fill="#8b9bb0" opacity="0.5"/>
+  <rect x="700" y="68" width="180" height="32" rx="10" fill="rgba(34,211,238,0.18)" stroke="#22d3ee"/>
+  <text x="790" y="90" text-anchor="middle" fill="#22d3ee" font-family="system-ui,sans-serif" font-size="14" font-weight="600">Weekly reports</text>
+
+  <rect x="48" y="148" width="280" height="320" rx="20" fill="#101820" stroke="rgba(148,163,184,0.18)"/>
+  <circle cx="188" cy="280" r="78" fill="none" stroke="rgba(34,211,238,0.2)" stroke-width="16"/>
+  <circle cx="188" cy="280" r="78" fill="none" stroke="url(#accent)" stroke-width="16" stroke-dasharray="360" stroke-dashoffset="90" stroke-linecap="round"/>
+  <text x="188" y="275" text-anchor="middle" fill="#f4f7fb" font-family="system-ui,sans-serif" font-size="36" font-weight="700">92</text>
+  <text x="188" y="305" text-anchor="middle" fill="#8b9bb0" font-family="system-ui,sans-serif" font-size="13">SEO health</text>
+  <text x="188" y="430" text-anchor="middle" fill="#a78bfa" font-family="system-ui,sans-serif" font-size="14">Automated SEO audit</text>
+
+  <rect x="352" y="148" width="560" height="148" rx="20" fill="#101820" stroke="rgba(148,163,184,0.18)"/>
+  <text x="380" y="190" fill="#f4f7fb" font-family="system-ui,sans-serif" font-size="18" font-weight="700">Live Google position tracking</text>
+  <rect x="380" y="210" width="200" height="12" rx="6" fill="rgba(34,211,238,0.25)"/>
+  <rect x="380" y="210" width="148" height="12" rx="6" fill="#22d3ee"/>
+  <text x="600" y="221" fill="#8b9bb0" font-family="system-ui,sans-serif" font-size="13">Rank #4 · SERP page 1</text>
+  <rect x="380" y="240" width="200" height="12" rx="6" fill="rgba(167,139,250,0.25)"/>
+  <rect x="380" y="240" width="96" height="12" rx="6" fill="#a78bfa"/>
+  <text x="600" y="251" fill="#8b9bb0" font-family="system-ui,sans-serif" font-size="13">Keyword monitoring ON</text>
+
+  <rect x="352" y="320" width="270" height="148" rx="20" fill="#101820" stroke="rgba(148,163,184,0.18)"/>
+  <text x="380" y="362" fill="#f4f7fb" font-family="system-ui,sans-serif" font-size="16" font-weight="700">Client reports</text>
+  <text x="380" y="392" fill="#8b9bb0" font-family="system-ui,sans-serif" font-size="13">White label SEO emails</text>
+  <text x="380" y="418" fill="#8b9bb0" font-family="system-ui,sans-serif" font-size="13">PDF + fix plan every week</text>
+
+  <rect x="642" y="320" width="270" height="148" rx="20" fill="#101820" stroke="rgba(148,163,184,0.18)"/>
+  <text x="670" y="362" fill="#f4f7fb" font-family="system-ui,sans-serif" font-size="16" font-weight="700">Agency oversight</text>
+  <text x="670" y="392" fill="#8b9bb0" font-family="system-ui,sans-serif" font-size="13">Continuous SEO monitoring</text>
+  <text x="670" y="418" fill="#8b9bb0" font-family="system-ui,sans-serif" font-size="13">SERP rank improvement tips</text>
+</svg>

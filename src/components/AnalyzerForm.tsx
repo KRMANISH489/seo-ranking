@@ -133,7 +133,8 @@ export function AnalyzerForm({
       </div>
 
       <p className="mt-3 px-1 text-xs text-[var(--muted)]">
-        Report emails go to client + admin. Weekly monitoring stays ON until admin pauses it in Monitors.
+        Weekly reports email the client inbox. Continuous SEO monitoring stays ON until you pause it
+        from the agency dashboard.
       </p>
     </form>
   );

@@ -127,7 +127,7 @@ function buildHtml(opts: {
     </div>
 
     <p style="color:#64748b;font-size:12px;margin-top:28px;">
-      Automated by CodAbhi (https://codabhi-dev.vercel.app). Weekly monitoring continues until admin disables it.
+      Automated by CodAbhi (https://codabhi-dev.vercel.app). Continuous SEO monitoring continues until paused in the agency dashboard.
     </p>
   </div>
 </body></html>`;
