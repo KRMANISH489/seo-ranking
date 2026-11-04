@@ -10,6 +10,8 @@ function SettingsInner() {
     adminEmail?: string | null;
     smtpUser?: string | null;
     serpConfigured?: boolean;
+    smtpFallbackReady?: boolean;
+    resendNeedsDomain?: boolean;
   }>({});
   const [storage, setStorage] = useState<"blob" | "filesystem" | null>(null);
   const [testMsg, setTestMsg] = useState<string | null>(null);
@@ -62,10 +64,14 @@ function SettingsInner() {
     },
     {
       name: "Email delivery",
-      ok: Boolean(status.smtpConfigured),
-      hint: status.emailProvider
-        ? `Provider: ${status.emailProvider}${status.smtpUser ? ` · ${status.smtpUser}` : ""}`
-        : "Set RESEND_API_KEY (recommended) or Gmail SMTP",
+      ok: Boolean(status.smtpConfigured) && (!status.resendNeedsDomain || status.smtpFallbackReady),
+      hint: status.resendNeedsDomain
+        ? status.smtpFallbackReady
+          ? "Resend testing mode — client mail uses Gmail SMTP fallback"
+          : "Resend can only email YOUR inbox until you verify a domain"
+        : status.emailProvider
+          ? `Provider: ${status.emailProvider}${status.smtpUser ? ` · ${status.smtpUser}` : ""}`
+          : "Set RESEND_API_KEY (recommended) or Gmail SMTP",
     },
     {
       name: "Admin email CC",

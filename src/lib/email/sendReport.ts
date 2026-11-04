@@ -55,36 +55,48 @@ function transporter() {
   });
 }
 
-async function deliverMail(opts: {
+function isResendDomainRestriction(msg: string): boolean {
+  return /only send testing emails to your own email|verify a domain|resend\.com\/domains|403/i.test(
+    msg
+  );
+}
+
+async function deliverViaResend(opts: {
   to: string;
   subject: string;
   html: string;
 }): Promise<void> {
-  const from = fromAddress();
   const key = resendKey();
+  if (!key) throw new Error("RESEND_API_KEY missing");
 
-  // Prefer Resend — more reliable on Vercel than Gmail SMTP
-  if (key) {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: [opts.to],
-        subject: opts.subject,
-        html: opts.html,
-      }),
-    });
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`Resend ${res.status}: ${body.slice(0, 280)}`);
-    }
-    return;
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromAddress(),
+      to: [opts.to],
+      subject: opts.subject,
+      html: opts.html,
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend ${res.status}: ${body.slice(0, 280)}`);
   }
+}
 
+async function deliverViaSmtp(opts: {
+  to: string;
+  subject: string;
+  html: string;
+}): Promise<void> {
+  if (!isSmtpConfigured()) {
+    throw new Error("SMTP not configured");
+  }
+  const from = process.env.SMTP_FROM?.trim() || fromAddress();
   const tx = transporter();
   await tx.sendMail({
     from,
@@ -92,6 +104,32 @@ async function deliverMail(opts: {
     subject: opts.subject,
     html: opts.html,
   });
+}
+
+async function deliverMail(opts: {
+  to: string;
+  subject: string;
+  html: string;
+}): Promise<void> {
+  const key = resendKey();
+
+  // Prefer Resend; if testing-mode blocks a client address, fall back to SMTP
+  if (key) {
+    try {
+      await deliverViaResend(opts);
+      return;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (isSmtpConfigured() && isResendDomainRestriction(msg)) {
+        console.warn("[email] Resend blocked recipient; falling back to SMTP for", opts.to);
+        await deliverViaSmtp(opts);
+        return;
+      }
+      throw err;
+    }
+  }
+
+  await deliverViaSmtp(opts);
 }
 
 function rankRows(ranking?: RankingReport | null): string {
@@ -253,22 +291,38 @@ export async function sendAuditEmails(opts: {
 }
 
 function friendlyEmailError(msg: string): string {
-  if (/only send testing emails to your own email|verify a domain|resend\.com\/domains/i.test(msg)) {
+  if (isResendDomainRestriction(msg)) {
+    if (isSmtpConfigured()) {
+      return (
+        "Resend cannot email this client yet (domain not verified). SMTP fallback also failed — " +
+        "fix Gmail App Password / SMTP_PASS, or verify a domain at https://resend.com/domains " +
+        "and set EMAIL_FROM to reports@yourdomain.com."
+      );
+    }
     return (
       "Resend testing mode: client emails blocked. Verify a domain at https://resend.com/domains " +
-      "then set EMAIL_FROM to an address on that domain (e.g. reports@yourdomain.com) and redeploy."
+      "then set EMAIL_FROM to an address on that domain (e.g. reports@yourdomain.com) and redeploy. " +
+      "Or configure Gmail SMTP (SMTP_HOST/USER/PASS/FROM) as fallback."
     );
   }
   return msg;
 }
 
+function resendFromIsOnboarding(): boolean {
+  const from = fromAddress().toLowerCase();
+  return from.includes("onboarding@resend.dev") || !process.env.EMAIL_FROM?.trim();
+}
+
 export function emailStatus() {
   const usingResend = Boolean(resendKey());
+  const smtpOk = isSmtpConfigured();
   return {
     smtpConfigured: isEmailConfigured(),
-    emailProvider: usingResend ? "resend" : isSmtpConfigured() ? "smtp" : null,
+    emailProvider: usingResend ? (smtpOk ? "resend+smtp-fallback" : "resend") : smtpOk ? "smtp" : null,
     adminEmail: getAdminEmail(),
     smtpUser: process.env.SMTP_USER?.trim() || null,
+    smtpFallbackReady: smtpOk,
+    resendNeedsDomain: usingResend && resendFromIsOnboarding(),
     serpConfigured: Boolean(process.env.SERPER_API_KEY || process.env.SERPAPI_KEY),
   };
 }

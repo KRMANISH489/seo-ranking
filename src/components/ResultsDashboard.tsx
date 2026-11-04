@@ -187,16 +187,18 @@ export function ResultsDashboard({ result }: { result: ProAuditResult }) {
                 <p className="font-semibold">Email issue</p>
                 <p className="mt-1">{result.emailDelivery.error}</p>
                 <p className="mt-2 text-xs text-rose-700">
-                  Quick fix: verify a domain at{" "}
+                  Fix options: (1){" "}
                   <a
                     href="https://resend.com/domains"
                     target="_blank"
                     rel="noreferrer"
                     className="underline"
                   >
-                    resend.com/domains
-                  </a>
-                  , then set <code>EMAIL_FROM</code> to an address on that domain and redeploy.
+                    Verify domain on Resend
+                  </a>{" "}
+                  → set <code>EMAIL_FROM=CodAbhi SEO &lt;reports@yourdomain.com&gt;</code> → Redeploy.
+                  (2) Or set a working Gmail App Password in <code>SMTP_PASS</code> (SMTP is used as
+                  automatic fallback for client inboxes). Details in Admin → Settings.
                 </p>
               </div>
             ) : null}
