@@ -63,6 +63,11 @@ function SettingsInner() {
       hint: "SERPER_API_KEY — live #position",
     },
     {
+      name: "PageSpeed Insights",
+      ok: true,
+      hint: "Optional PAGESPEED_API_KEY — without it, shared quota can hit 429",
+    },
+    {
       name: "Email delivery",
       ok: Boolean(status.smtpConfigured) && (!status.resendNeedsDomain || status.smtpFallbackReady),
       hint: status.resendNeedsDomain

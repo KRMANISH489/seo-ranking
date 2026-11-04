@@ -42,6 +42,7 @@ Add for **Production** (+ Preview recommended):
 | `SERPER_API_KEY` | *(your key)* |
 | `SERP_GL` | `in` |
 | `SERP_HL` | `en` |
+| `PAGESPEED_API_KEY` | Google Cloud key for PageSpeed Insights API (avoids 429 quota) |
 
 ## 3) Redeploy
 

@@ -298,7 +298,25 @@ export function ResultsDashboard({ result }: { result: ProAuditResult }) {
         }
       >
         {result.pageSpeed.error ? (
-          <p className="text-sm text-[#fde68a]">{result.pageSpeed.error}</p>
+          <div className="space-y-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+            <p className="font-semibold">PageSpeed unavailable for this run</p>
+            <p className="text-amber-900/90">{result.pageSpeed.error}</p>
+            {result.pageSpeed.reportUrl ? (
+              <a
+                href={result.pageSpeed.reportUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block font-medium text-[var(--accent)] hover:underline"
+              >
+                Open PageSpeed report in browser →
+              </a>
+            ) : null}
+            <p className="text-xs text-amber-800/80">
+              Fix: Google Cloud → enable PageSpeed Insights API → create API key → set{" "}
+              <code className="rounded bg-white/70 px-1">PAGESPEED_API_KEY</code> on Vercel → Redeploy.
+              Or uncheck PageSpeed on the form to skip this layer.
+            </p>
+          </div>
         ) : result.pageSpeed.enabled ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
