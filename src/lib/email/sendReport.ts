@@ -197,45 +197,57 @@ export async function sendAuditEmails(opts: {
   }
 
   const sent: string[] = [];
-  try {
-    const isWeekly = Boolean(opts.isWeekly);
+  const errors: string[] = [];
+  const isWeekly = Boolean(opts.isWeekly);
 
-    const clientHtml = buildHtml({
-      audit: opts.audit,
-      audience: "client",
-      isWeekly,
-      appBaseUrl,
-    });
-    await deliverMail({
-      to: opts.clientEmail,
-      subject: `${isWeekly ? "[Weekly]" : "[Audit]"} CodAbhi SEO · Score ${opts.audit.overallScore} · ${opts.audit.url}`,
-      html: clientHtml,
-    });
-    sent.push(opts.clientEmail);
-
-    if (admin && admin.toLowerCase() !== opts.clientEmail.toLowerCase()) {
-      const adminHtml = buildHtml({
-        audit: opts.audit,
-        audience: "admin",
-        isWeekly,
-        appBaseUrl,
-      });
+  async function trySend(to: string, audience: "client" | "admin", subject: string) {
+    try {
       await deliverMail({
-        to: admin,
-        subject: `${isWeekly ? "[Weekly Admin]" : "[Audit Admin]"} ${opts.audit.url} · Score ${opts.audit.overallScore} · Best rank ${opts.audit.ranking?.bestPosition ?? "n/a"}`,
-        html: adminHtml,
+        to,
+        subject,
+        html: buildHtml({
+          audit: opts.audit,
+          audience,
+          isWeekly,
+          appBaseUrl,
+        }),
       });
-      sent.push(admin);
+      sent.push(to);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Email send failed";
+      errors.push(`${to}: ${friendlyEmailError(msg)}`);
     }
-
-    return { sent, skipped: null, error: null };
-  } catch (err) {
-    return {
-      sent,
-      skipped: null,
-      error: err instanceof Error ? err.message : "Email send failed",
-    };
   }
+
+  await trySend(
+    opts.clientEmail,
+    "client",
+    `${isWeekly ? "[Weekly]" : "[Audit]"} CodAbhi SEO · Score ${opts.audit.overallScore} · ${opts.audit.url}`
+  );
+
+  if (admin && admin.toLowerCase() !== opts.clientEmail.toLowerCase()) {
+    await trySend(
+      admin,
+      "admin",
+      `${isWeekly ? "[Weekly Admin]" : "[Audit Admin]"} ${opts.audit.url} · Score ${opts.audit.overallScore} · Best rank ${opts.audit.ranking?.bestPosition ?? "n/a"}`
+    );
+  }
+
+  return {
+    sent,
+    skipped: null,
+    error: errors.length ? errors.join(" | ") : null,
+  };
+}
+
+function friendlyEmailError(msg: string): string {
+  if (/only send testing emails to your own email|verify a domain|resend\.com\/domains/i.test(msg)) {
+    return (
+      "Resend testing mode: client emails blocked. Verify a domain at https://resend.com/domains " +
+      "then set EMAIL_FROM to an address on that domain (e.g. reports@yourdomain.com) and redeploy."
+    );
+  }
+  return msg;
 }
 
 export function emailStatus() {
@@ -273,9 +285,9 @@ export async function sendTestEmail(to: string): Promise<{ ok: boolean; error: s
     if (/BadCredentials|Invalid login|535/i.test(msg)) {
       return {
         ok: false,
-        error: `${msg} | Gmail App Password invalid. Easier fix: create free key at https://resend.com → set RESEND_API_KEY on Vercel → Redeploy. Optional EMAIL_FROM=CodAbhi SEO <onboarding@resend.dev> for testing.`,
+        error: `${msg} | Gmail App Password invalid. Easier fix: create free key at https://resend.com → set RESEND_API_KEY on Vercel → Redeploy.`,
       };
     }
-    return { ok: false, error: msg };
+    return { ok: false, error: friendlyEmailError(msg) };
   }
 }

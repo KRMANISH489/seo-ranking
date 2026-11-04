@@ -158,9 +158,32 @@ function SettingsInner() {
           </li>
         </ol>
         <p className="text-xs">
-          Free Resend can send to your own email with <code>onboarding@resend.dev</code>. For client
-          domains later, verify a domain in Resend.
+          Free Resend with <code>onboarding@resend.dev</code> can only email{" "}
+          <strong className="text-[var(--text)]">your own Resend account inbox</strong>. To email
+          clients (any address):
         </p>
+        <ol className="list-decimal space-y-2 pl-5 text-xs">
+          <li>
+            Open{" "}
+            <a
+              href="https://resend.com/domains"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-[var(--accent)] hover:underline"
+            >
+              resend.com/domains
+            </a>{" "}
+            → Add Domain (e.g. yourdomain.com)
+          </li>
+          <li>Add the DNS records Resend shows (at your domain DNS provider)</li>
+          <li>
+            Set Vercel{" "}
+            <code className="text-[var(--accent)]">
+              EMAIL_FROM=CodAbhi SEO &lt;reports@yourdomain.com&gt;
+            </code>
+          </li>
+          <li>Redeploy → client emails will work</li>
+        </ol>
       </div>
 
       <div className="mt-8 space-y-4 rounded-2xl border border-[var(--line)] bg-white p-5 text-sm text-[var(--muted)] shadow-sm">

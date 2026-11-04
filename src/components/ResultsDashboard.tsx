@@ -183,7 +183,22 @@ export function ResultsDashboard({ result }: { result: ProAuditResult }) {
               <p className="text-amber-200">{result.emailDelivery.skipped}</p>
             ) : null}
             {result.emailDelivery?.error ? (
-              <p className="text-rose-300">{result.emailDelivery.error}</p>
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
+                <p className="font-semibold">Email issue</p>
+                <p className="mt-1">{result.emailDelivery.error}</p>
+                <p className="mt-2 text-xs text-rose-700">
+                  Quick fix: verify a domain at{" "}
+                  <a
+                    href="https://resend.com/domains"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    resend.com/domains
+                  </a>
+                  , then set <code>EMAIL_FROM</code> to an address on that domain and redeploy.
+                </p>
+              </div>
             ) : null}
           </div>
         </Section>
