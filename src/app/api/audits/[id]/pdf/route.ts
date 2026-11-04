@@ -12,8 +12,8 @@ export async function GET(
     return NextResponse.json({ error: "Audit not found." }, { status: 404 });
   }
 
-  const pdf = buildAuditPdf(audit);
-  const filename = `rankscope-${id.slice(0, 8)}.pdf`;
+  const pdf = await buildAuditPdf(audit);
+  const filename = `codabhi-seo-${id.slice(0, 8)}.pdf`;
 
   return new NextResponse(new Uint8Array(pdf), {
     status: 200,

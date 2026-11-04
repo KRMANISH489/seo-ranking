@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnalyzerForm, type AnalyzeOptionsInput } from "@/components/AnalyzerForm";
 import { ResultsDashboard } from "@/components/ResultsDashboard";
 import { BrandLogo } from "@/components/BrandLogo";
+import { TrustStats } from "@/components/TrustStats";
 import type { ProAuditResult } from "@/lib/seo/proTypes";
 
 const workflow = [
@@ -141,6 +142,12 @@ export default function Home() {
             <div className="mt-6 max-w-xl sm:mt-8">
               <AnalyzerForm onSubmit={runAudit} loading={loading} />
             </div>
+
+            <TrustStats />
+            <p className="mt-3 max-w-xl text-xs text-[var(--muted)] sm:text-sm">
+              Trusted workflow for agencies — every audit saves a full PDF with errors, exact
+              solutions, keyword plan, and CodAbhi branding so clients take action with confidence.
+            </p>
           </div>
 
           <div className="hero-float relative mx-auto w-full max-w-sm animate-fade-up-delay sm:max-w-md">
