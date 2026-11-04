@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
 
     result.clientEmail = clientEmail;
 
+    // Persist first so History/Admin keep data even if email is slow or fails
     let monitorId: string | null = null;
     if (weeklyMonitor) {
       const monitor = await upsertMonitor({
@@ -76,15 +77,24 @@ export async function POST(req: NextRequest) {
       result.monitorId = monitorId;
     }
 
+    const saved = save ? await saveAudit(result) : result;
+
     if (sendEmail) {
-      result.emailDelivery = await sendAuditEmails({
-        audit: result,
+      saved.emailDelivery = await sendAuditEmails({
+        audit: saved,
         clientEmail,
         isWeekly: false,
       });
+      // Refresh stored audit with email delivery status (best-effort)
+      if (save && saved.id) {
+        try {
+          await saveAudit(saved);
+        } catch {
+          // ignore secondary write
+        }
+      }
     }
 
-    const saved = save ? await saveAudit(result) : result;
     return NextResponse.json(saved);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Analysis failed.";

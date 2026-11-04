@@ -4,5 +4,16 @@
       "path": "/api/cron/weekly",
       "schedule": "0 9 * * 1"
     }
-  ]
+  ],
+  "functions": {
+    "src/app/api/analyze/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/compare/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/cron/weekly/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

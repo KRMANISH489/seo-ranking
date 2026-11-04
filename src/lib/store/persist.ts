@@ -33,13 +33,19 @@ export async function persistJson(key: string, data: unknown): Promise<void> {
   const body = JSON.stringify(data);
 
   if (useBlob()) {
-    await put(blobPath(key), body, {
-      access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      contentType: "application/json",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    });
+    try {
+      await put(blobPath(key), body, {
+        access: "public",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        contentType: "application/json",
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Blob write failed";
+      console.error("[persist] blob put failed", key, msg);
+      throw new Error(`Could not save data (${key}): ${msg}`);
+    }
     return;
   }
 

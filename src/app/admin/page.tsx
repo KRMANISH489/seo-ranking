@@ -22,6 +22,7 @@ type Stats = {
     smtpConfigured: boolean;
     adminEmail: string | null;
     serpConfigured: boolean;
+    storage?: "blob" | "filesystem";
   };
 };
 
@@ -101,7 +102,10 @@ function DashboardInner() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="glass rounded-xl p-4 text-sm">
+          Storage: {stats.system.storage === "blob" ? "Blob (persistent)" : "Ephemeral"}
+        </div>
         <div className="glass rounded-xl p-4 text-sm">
           SMTP: {stats.system.smtpConfigured ? "Ready" : "Not configured"}
         </div>
@@ -112,6 +116,20 @@ function DashboardInner() {
           Admin email: {stats.system.adminEmail || "—"}
         </div>
       </div>
+
+      {stats.totals.audits === 0 && (
+        <div className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950">
+          <p className="font-semibold">Dashboard is empty because no audits are stored yet</p>
+          <p className="mt-1 text-sky-900/80">
+            Old Vercel <code className="rounded bg-white/70 px-1">/tmp</code> data was wiped. Blob
+            storage is ready now — run a public audit once and counts will appear here, in Clients,
+            and in Audits.
+          </p>
+          <Link href="/" className="mt-2 inline-block font-medium text-[var(--accent)] hover:underline">
+            Run an audit on the public site →
+          </Link>
+        </div>
+      )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section className="glass rounded-2xl p-5">

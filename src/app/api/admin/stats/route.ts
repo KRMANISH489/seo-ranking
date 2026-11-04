@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin/auth";
-import { listAudits } from "@/lib/store/audits";
+import { getStorageMode, listAudits } from "@/lib/store/audits";
 import { listMonitors } from "@/lib/store/monitors";
 import { emailStatus } from "@/lib/email/sendReport";
 
@@ -42,7 +42,10 @@ export async function GET() {
         },
         recentAudits: audits.slice(0, 8),
         recentMonitors: monitors.slice(0, 8),
-        system: emailStatus(),
+        system: {
+          ...emailStatus(),
+          storage: getStorageMode(),
+        },
       },
       { headers: { "Cache-Control": "private, no-store" } }
     );
