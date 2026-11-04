@@ -132,7 +132,7 @@ function buildHtml(opts: {
   appBaseUrl: string;
 }): string {
   const { audit, audience, isWeekly, appBaseUrl } = opts;
-  const tips = rankingSpeedTips(audit.ranking);
+  const tips = audit.ranking ? rankingSpeedTips(audit.ranking) : [];
   const tipHtml = tips.map((t) => `<li>${escapeHtml(t)}</li>`).join("");
   const reportUrl = `${appBaseUrl}/report/${audit.id}`;
   const pdfUrl = `${appBaseUrl}/api/audits/${audit.id}/pdf`;
