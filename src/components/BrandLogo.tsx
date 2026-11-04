@@ -1,17 +1,18 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type LogoSize = "sm" | "md" | "lg";
 
 const sizeMap: Record<
   LogoSize,
-  { mark: string; brand: string; tag: string; gap: string }
+  { mark: number; brand: string; tag: string; gap: string }
 > = {
-  sm: { mark: "h-8 w-8", brand: "text-[15px]", tag: "text-[9px]", gap: "gap-2" },
-  md: { mark: "h-9 w-9", brand: "text-base", tag: "text-[10px]", gap: "gap-2.5" },
-  lg: { mark: "h-11 w-11 sm:h-12 sm:w-12", brand: "text-xl sm:text-2xl", tag: "text-[10px]", gap: "gap-3" },
+  sm: { mark: 32, brand: "text-[15px]", tag: "text-[9px]", gap: "gap-2" },
+  md: { mark: 36, brand: "text-base", tag: "text-[10px]", gap: "gap-2.5" },
+  lg: { mark: 48, brand: "text-xl sm:text-2xl", tag: "text-[10px]", gap: "gap-3" },
 };
 
-/** Modern geometric mark — rising signal bars */
+/** CodAbhi SEO mark — rising bars on azure→teal */
 export function BrandLogo({
   href = "/",
   size = "md",
@@ -27,16 +28,14 @@ export function BrandLogo({
 
   const inner = (
     <div className={`group flex items-center ${s.gap}`}>
-      <span
-        className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(145deg,#0a84ff_0%,#0077ea_50%,#00b39a_120%)] shadow-[0_10px_24px_rgba(10,132,255,0.28)] ${s.mark}`}
-        aria-hidden
-      >
-        <svg viewBox="0 0 40 40" className="h-[58%] w-[58%]" fill="none">
-          <rect x="7" y="22" width="6" height="11" rx="2" fill="white" opacity="0.55" />
-          <rect x="17" y="15" width="6" height="18" rx="2" fill="white" opacity="0.8" />
-          <rect x="27" y="8" width="6" height="25" rx="2" fill="white" />
-        </svg>
-      </span>
+      <Image
+        src="/codabhi-mark.png"
+        alt="CodAbhi SEO"
+        width={s.mark}
+        height={s.mark}
+        className="shrink-0 rounded-[28%] shadow-[0_10px_24px_rgba(10,132,255,0.28)]"
+        priority={size === "lg"}
+      />
       <div className="flex min-w-0 flex-col leading-none">
         <span className={`font-display font-bold tracking-[-0.03em] text-[var(--text)] ${s.brand}`}>
           CodAbhi

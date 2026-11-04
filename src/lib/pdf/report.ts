@@ -29,19 +29,17 @@ function ensureSpace(doc: jsPDF, y: number, need = 80): number {
 }
 
 async function loadLogoDataUrl(): Promise<string | null> {
-  try {
-    const file = path.join(process.cwd(), "public", "codabhi-logo.png");
-    const buf = await fs.readFile(file);
-    return `data:image/png;base64,${buf.toString("base64")}`;
-  } catch {
+  const candidates = ["codabhi-mark.png", "codabhi-logo.png", "icon-32.png"];
+  for (const name of candidates) {
     try {
-      const file = path.join(process.cwd(), "public", "icon-32.png");
+      const file = path.join(process.cwd(), "public", name);
       const buf = await fs.readFile(file);
       return `data:image/png;base64,${buf.toString("base64")}`;
     } catch {
-      return null;
+      // try next
     }
   }
+  return null;
 }
 
 function drawPromoFooter(doc: jsPDF, margin: number) {
@@ -69,22 +67,24 @@ export async function buildAuditPdf(audit: ProAuditResult): Promise<Buffer> {
   const logo = await loadLogoDataUrl();
 
   // —— Header / logo + company promo ——
+  const logoSize = 42;
   if (logo) {
     try {
-      doc.addImage(logo, "PNG", margin, y, 36, 36);
+      doc.addImage(logo, "PNG", margin, y, logoSize, logoSize);
     } catch {
       // ignore bad image
     }
   }
+  const textX = margin + (logo ? logoSize + 12 : 0);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
+  doc.setFontSize(20);
   doc.setTextColor(...BRAND.ink);
-  doc.text("CodAbhi SEO", margin + (logo ? 46 : 0), y + 16);
+  doc.text("CodAbhi SEO", textX, y + 18);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(...BRAND.muted);
-  doc.text("Professional SEO audit · Rank tracking · Weekly client reports", margin + (logo ? 46 : 0), y + 30);
-  y += 52;
+  doc.text("Professional SEO audit · Rank tracking · Weekly client reports", textX, y + 34);
+  y += 58;
 
   doc.setFillColor(...BRAND.blue);
   doc.roundedRect(margin, y, 515, 46, 8, 8, "F");

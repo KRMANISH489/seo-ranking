@@ -68,9 +68,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/codabhi-mark.png", type: "image/png", sizes: "256x256" },
       { url: "/icon-32.png", type: "image/png", sizes: "32x32" },
     ],
     apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+    shortcut: ["/codabhi-mark.png"],
   },
 };
 
@@ -82,7 +84,7 @@ const jsonLd = {
       "@id": `${SITE_URL}/#organization`,
       name: "CodAbhi",
       url: "https://codabhi-dev.vercel.app/",
-      logo: `${SITE_URL}/codabhi-logo.png`,
+      logo: `${SITE_URL}/codabhi-mark.png`,
     },
     {
       "@type": "WebSite",

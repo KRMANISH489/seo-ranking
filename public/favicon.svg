@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#0a0a0f"/>
-  <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="rgba(255,255,255,0.12)"/>
-  <path d="M4 4H8V8H4V4Z" stroke="#22d3ee" stroke-width="1.5" opacity="0.85"/>
-  <path d="M28 28H24V24H28V28Z" stroke="#a78bfa" stroke-width="1.5" opacity="0.85"/>
-  <text x="8" y="22" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700" fill="#22d3ee">C</text>
-  <text x="17" y="22" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700" fill="#a78bfa">A</text>
+  <defs>
+    <linearGradient id="g" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0a84ff"/>
+      <stop offset="1" stop-color="#00c2a8"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#g)"/>
+  <rect x="7" y="18" width="5" height="8" rx="1.5" fill="#fff" opacity="0.7"/>
+  <rect x="13.5" y="13" width="5" height="13" rx="1.5" fill="#fff" opacity="0.88"/>
+  <rect x="20" y="8" width="5" height="18" rx="1.5" fill="#fff"/>
 </svg>

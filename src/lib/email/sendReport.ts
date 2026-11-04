@@ -139,37 +139,49 @@ function buildHtml(opts: {
   const best =
     audit.ranking?.bestPosition != null ? `#${audit.ranking.bestPosition}` : "n/a";
 
-  return `<!DOCTYPE html><html><body style="margin:0;background:#0b1117;color:#f4f7fb;font-family:Arial,sans-serif;">
+  const logoUrl = `${appBaseUrl}/codabhi-mark.png`;
+
+  return `<!DOCTYPE html><html><body style="margin:0;background:#eef6ff;color:#0b1220;font-family:Arial,Helvetica,sans-serif;">
   <div style="max-width:640px;margin:0 auto;padding:28px;">
-    <p style="color:#22d3ee;letter-spacing:2px;font-size:12px;font-weight:700;text-transform:uppercase;">CodAbhi SEO</p>
-    <h1 style="font-size:26px;margin:8px 0 6px;">${isWeekly ? "Weekly" : "Audit"} report</h1>
-    <p style="color:#94a3b8;font-size:14px;">For ${audience === "admin" ? "Admin" : "Client"} · ${new Date(audit.analyzedAt).toLocaleString()}</p>
-    <p style="margin:18px 0 8px;"><a href="${escapeHtml(audit.url)}" style="color:#22d3ee;">${escapeHtml(audit.url)}</a></p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:18px;">
+      <tr>
+        <td style="vertical-align:middle;padding-right:12px;">
+          <img src="${logoUrl}" width="44" height="44" alt="CodAbhi SEO" style="display:block;border-radius:12px;" />
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="font-size:18px;font-weight:700;color:#0b1220;line-height:1.2;">CodAbhi <span style="color:#0a84ff;">SEO</span></div>
+          <div style="font-size:11px;color:#5b6b7c;letter-spacing:0.12em;text-transform:uppercase;margin-top:4px;">audit · rank · report</div>
+        </td>
+      </tr>
+    </table>
+    <h1 style="font-size:26px;margin:8px 0 6px;color:#0b1220;">${isWeekly ? "Weekly" : "Audit"} report</h1>
+    <p style="color:#5b6b7c;font-size:14px;">For ${audience === "admin" ? "Admin" : "Client"} · ${new Date(audit.analyzedAt).toLocaleString()}</p>
+    <p style="margin:18px 0 8px;"><a href="${escapeHtml(audit.url)}" style="color:#0a84ff;">${escapeHtml(audit.url)}</a></p>
 
     <div style="display:flex;gap:12px;margin:20px 0;">
-      <div style="flex:1;background:#15202b;border-radius:12px;padding:16px;">
-        <div style="font-size:12px;color:#94a3b8;">SEO score</div>
-        <div style="font-size:36px;font-weight:700;color:#22d3ee;">${audit.overallScore}</div>
-        <div style="color:#a78bfa;">Grade ${escapeHtml(audit.grade)}</div>
+      <div style="flex:1;background:#ffffff;border:1px solid #d7e6f7;border-radius:12px;padding:16px;">
+        <div style="font-size:12px;color:#5b6b7c;">SEO score</div>
+        <div style="font-size:36px;font-weight:700;color:#0a84ff;">${audit.overallScore}</div>
+        <div style="color:#00a88f;">Grade ${escapeHtml(audit.grade)}</div>
       </div>
-      <div style="flex:1;background:#15202b;border-radius:12px;padding:16px;">
-        <div style="font-size:12px;color:#94a3b8;">Best Google rank</div>
-        <div style="font-size:36px;font-weight:700;color:#a78bfa;">${best}</div>
-        <div style="color:#94a3b8;font-size:13px;">Live SERP check</div>
+      <div style="flex:1;background:#ffffff;border:1px solid #d7e6f7;border-radius:12px;padding:16px;">
+        <div style="font-size:12px;color:#5b6b7c;">Best Google rank</div>
+        <div style="font-size:36px;font-weight:700;color:#0b1220;">${best}</div>
+        <div style="color:#5b6b7c;font-size:13px;">Live SERP check</div>
       </div>
     </div>
 
-    <h2 style="font-size:18px;margin-top:24px;">Keyword ranks</h2>
-    <div style="background:#fff;color:#0f172a;border-radius:12px;padding:8px;overflow:auto;">
+    <h2 style="font-size:18px;margin-top:24px;color:#0b1220;">Keyword ranks</h2>
+    <div style="background:#fff;color:#0f172a;border-radius:12px;padding:8px;overflow:auto;border:1px solid #d7e6f7;">
       ${rankRows(audit.ranking)}
     </div>
 
-    <h2 style="font-size:18px;margin-top:24px;">Rank improvement tips</h2>
-    <ul style="color:#cbd5e1;line-height:1.6;">${tipHtml || "<li>Keep monitoring weekly.</li>"}</ul>
+    <h2 style="font-size:18px;margin-top:24px;color:#0b1220;">Rank improvement tips</h2>
+    <ul style="color:#334155;line-height:1.6;">${tipHtml || "<li>Keep monitoring weekly.</li>"}</ul>
 
     <div style="margin-top:28px;">
-      <a href="${pdfUrl}" style="display:inline-block;background:#22d3ee;color:#041516;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700;margin-right:10px;">Download PDF</a>
-      <a href="${reportUrl}" style="display:inline-block;color:#22d3ee;text-decoration:underline;padding:12px 0;">Open full report</a>
+      <a href="${pdfUrl}" style="display:inline-block;background:#0a84ff;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700;margin-right:10px;">Download PDF</a>
+      <a href="${reportUrl}" style="display:inline-block;color:#0a84ff;text-decoration:underline;padding:12px 0;">Open full report</a>
     </div>
 
     <p style="color:#64748b;font-size:12px;margin-top:28px;">
