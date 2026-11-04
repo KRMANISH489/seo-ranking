@@ -3,7 +3,7 @@ import type { PriorityAction } from "@/lib/seo/proTypes";
 const levelStyle: Record<string, string> = {
   P0: "border-rose-400/40 bg-rose-500/10 text-rose-200",
   P1: "border-amber-400/40 bg-amber-500/10 text-amber-100",
-  P2: "border-violet-400/40 bg-[var(--purple-soft)] text-violet-100",
+  P2: "border-[rgba(228,213,181,0.4)] bg-[var(--purple-soft)] text-[var(--accent-2)]",
 };
 
 export function PriorityBoard({ actions }: { actions: PriorityAction[] }) {

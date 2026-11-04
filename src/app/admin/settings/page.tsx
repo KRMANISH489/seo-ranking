@@ -67,22 +67,29 @@ function SettingsInner() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold tracking-tight">Backend settings</h1>
+      <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--text)]">
+        Backend settings
+      </h1>
       <p className="mt-1 text-sm text-[var(--muted)]">
-        Config via <code className="text-[var(--accent)]">.env.local</code> (local) or Vercel Environment
-        Variables (production).
+        Config via <code className="rounded bg-[var(--bg-soft)] px-1.5 py-0.5 text-[var(--accent)]">.env.local</code>{" "}
+        (local) or Vercel Environment Variables (production).
       </p>
 
       <div className="mt-6 space-y-3">
         {rows.map((r) => (
-          <div key={r.name} className="glass flex items-center justify-between gap-3 rounded-2xl p-5">
-            <div>
-              <div className="font-medium">{r.name}</div>
+          <div
+            key={r.name}
+            className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--line)] bg-white p-5 shadow-sm"
+          >
+            <div className="min-w-0">
+              <div className="font-semibold text-[var(--text)]">{r.name}</div>
               <div className="mt-1 text-sm text-[var(--muted)]">{r.hint}</div>
             </div>
             <span
-              className={`rounded-md px-2 py-1 text-xs font-bold uppercase ${
-                r.ok ? "bg-emerald-500/15 text-emerald-300" : "bg-amber-500/15 text-amber-200"
+              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
+                r.ok
+                  ? "bg-[rgba(0,194,168,0.14)] text-[#0a7a6a]"
+                  : "bg-[rgba(217,119,6,0.14)] text-[#b45309]"
               }`}
             >
               {r.ok ? "Ready" : "Setup"}
@@ -91,8 +98,36 @@ function SettingsInner() {
         ))}
       </div>
 
-      <div className="glass mt-8 space-y-4 rounded-2xl p-5 text-sm text-[var(--muted)]">
-        <p className="font-medium text-[var(--text)]">Gmail SMTP setup (email reports)</p>
+      {!status.serpConfigured ? (
+        <div className="mt-8 space-y-3 rounded-2xl border border-[var(--line)] bg-white p-5 text-sm text-[var(--muted)] shadow-sm">
+          <p className="font-semibold text-[var(--text)]">Google rank (Serper) setup</p>
+          <ol className="list-decimal space-y-2 pl-5">
+            <li>
+              Sign up at{" "}
+              <a
+                href="https://serper.dev"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-[var(--accent)] hover:underline"
+              >
+                serper.dev
+              </a>{" "}
+              and copy your API key
+            </li>
+            <li>
+              Local: add <code className="text-[var(--accent)]">SERPER_API_KEY=...</code> in{" "}
+              <code className="text-[var(--accent)]">.env.local</code>
+            </li>
+            <li>
+              Production: Vercel → Environment Variables →{" "}
+              <code className="text-[var(--accent)]">SERPER_API_KEY</code> → Redeploy
+            </li>
+          </ol>
+        </div>
+      ) : null}
+
+      <div className="mt-8 space-y-4 rounded-2xl border border-[var(--line)] bg-white p-5 text-sm text-[var(--muted)] shadow-sm">
+        <p className="font-semibold text-[var(--text)]">Gmail SMTP setup (email reports)</p>
         <ol className="list-decimal space-y-2 pl-5">
           <li>
             Google Account →{" "}
@@ -100,7 +135,7 @@ function SettingsInner() {
               href="https://myaccount.google.com/security"
               target="_blank"
               rel="noreferrer"
-              className="text-[var(--accent)] hover:underline"
+              className="font-medium text-[var(--accent)] hover:underline"
             >
               Security
             </a>{" "}
@@ -112,7 +147,7 @@ function SettingsInner() {
               href="https://myaccount.google.com/apppasswords"
               target="_blank"
               rel="noreferrer"
-              className="text-[var(--accent)] hover:underline"
+              className="font-medium text-[var(--accent)] hover:underline"
             >
               App Passwords
             </a>{" "}
@@ -128,8 +163,15 @@ function SettingsInner() {
             <code className="text-[var(--accent)]">SMTP_FROM</code>,{" "}
             <code className="text-[var(--accent)]">ADMIN_EMAIL</code>
           </li>
-          <li>Vercel pe same keys add karke <strong className="text-[var(--text)]">Redeploy</strong></li>
+          <li>
+            Vercel pe same keys add karke <strong className="text-[var(--text)]">Redeploy</strong>
+          </li>
         </ol>
+        <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          <strong>535 BadCredentials?</strong> Use a Gmail App Password only (not login password).{" "}
+          <code className="text-[var(--accent)]">SMTP_USER</code> must match that Gmail. No quotes around
+          Vercel values. Save → Redeploy → test again.
+        </p>
 
         <button
           type="button"
@@ -139,7 +181,7 @@ function SettingsInner() {
         >
           {testing ? "Sending…" : "Send test email to admin"}
         </button>
-        {testMsg && <p className="text-[var(--text)]">{testMsg}</p>}
+        {testMsg && <p className="font-medium text-[var(--text)]">{testMsg}</p>}
       </div>
     </div>
   );

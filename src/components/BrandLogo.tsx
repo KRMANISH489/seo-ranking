@@ -4,32 +4,14 @@ type LogoSize = "sm" | "md" | "lg";
 
 const sizeMap: Record<
   LogoSize,
-  { box: string; text: string; brand: string; tag: string }
+  { mark: string; brand: string; tag: string; gap: string }
 > = {
-  sm: {
-    box: "h-8 w-8 rounded-lg text-[10px]",
-    text: "text-[9px]",
-    brand: "text-base",
-    tag: "text-[9px] tracking-[0.18em]",
-  },
-  md: {
-    box: "h-10 w-10 rounded-xl text-[11px]",
-    text: "text-[10px]",
-    brand: "text-lg",
-    tag: "text-[10px] tracking-[0.2em]",
-  },
-  lg: {
-    box: "h-12 w-12 rounded-xl text-sm",
-    text: "text-xs",
-    brand: "text-xl",
-    tag: "text-[10px] tracking-[0.22em]",
-  },
+  sm: { mark: "h-8 w-8", brand: "text-[15px]", tag: "text-[9px]", gap: "gap-2" },
+  md: { mark: "h-9 w-9", brand: "text-base", tag: "text-[10px]", gap: "gap-2.5" },
+  lg: { mark: "h-11 w-11 sm:h-12 sm:w-12", brand: "text-xl sm:text-2xl", tag: "text-[10px]", gap: "gap-3" },
 };
 
-/**
- * CodAbhi logo — same markup/style as https://codabhi-dev.vercel.app/
- * (HTML/CSS mark, not a screenshot image)
- */
+/** Modern geometric mark — rising signal bars */
 export function BrandLogo({
   href = "/",
   size = "md",
@@ -44,28 +26,27 @@ export function BrandLogo({
   const s = sizeMap[size];
 
   const inner = (
-    <div className="group flex items-center gap-2.5">
-      <div
-        className={`relative flex shrink-0 items-center justify-center overflow-hidden border border-white/10 bg-gradient-to-br from-[#111118] to-[#0a0a0f] font-mono font-bold shadow-lg shadow-black/40 ${s.box}`}
+    <div className={`group flex items-center ${s.gap}`}>
+      <span
+        className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(145deg,#0a84ff_0%,#0077ea_50%,#00b39a_120%)] shadow-[0_10px_24px_rgba(10,132,255,0.28)] ${s.mark}`}
+        aria-hidden
       >
-        <span className="absolute left-0 top-0 h-3 w-3 rounded-tl-lg border-l-2 border-t-2 border-cyan-400/70" />
-        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-br-lg border-b-2 border-r-2 border-violet-500/70" />
-        <span className={`relative z-10 tracking-tight ${s.text}`}>
-          <span className="text-cyan-400">C</span>
-          <span className="text-violet-400">A</span>
-        </span>
-        <span className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      </div>
-      <div className="flex flex-col leading-tight">
-        <span className={`font-mono font-semibold tracking-tight ${s.brand}`}>
-          <span className="text-cyan-400">Cod</span>
-          <span className="text-white">Abhi</span>
+        <svg viewBox="0 0 40 40" className="h-[58%] w-[58%]" fill="none">
+          <rect x="7" y="22" width="6" height="11" rx="2" fill="white" opacity="0.55" />
+          <rect x="17" y="15" width="6" height="18" rx="2" fill="white" opacity="0.8" />
+          <rect x="27" y="8" width="6" height="25" rx="2" fill="white" />
+        </svg>
+      </span>
+      <div className="flex min-w-0 flex-col leading-none">
+        <span className={`font-display font-bold tracking-[-0.03em] text-[var(--text)] ${s.brand}`}>
+          CodAbhi
+          <span className="ml-1.5 font-semibold text-[var(--accent)]">SEO</span>
         </span>
         {showTagline ? (
           <span
-            className={`mt-0.5 hidden font-medium uppercase text-slate-500 sm:block ${s.tag}`}
+            className={`mt-1 hidden font-medium tracking-[0.16em] text-[var(--muted)] uppercase sm:block ${s.tag}`}
           >
-            code · create · deliver
+            audit · rank · report
           </span>
         ) : null}
       </div>

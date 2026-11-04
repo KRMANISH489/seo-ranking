@@ -11,7 +11,7 @@ export function ScoreRing({
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (Math.min(100, Math.max(0, score)) / 100) * circumference;
   const color =
-    score >= 80 ? "#22d3ee" : score >= 60 ? "#a78bfa" : score >= 40 ? "#fbbf24" : "#fb7185";
+    score >= 80 ? "#0a84ff" : score >= 60 ? "#00c2a8" : score >= 40 ? "#d97706" : "#e11d48";
 
   return (
     <div className="score-ring-pulse relative mx-auto flex h-40 w-40 items-center justify-center">

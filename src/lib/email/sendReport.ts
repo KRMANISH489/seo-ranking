@@ -22,14 +22,22 @@ function isEmailConfigured(): boolean {
 
 function transporter() {
   const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER?.trim();
+  const pass = smtpPass();
+  // Prefer Gmail service preset (TLS + auth) when using smtp.gmail.com
+  const host = (process.env.SMTP_HOST || "").trim().toLowerCase();
+  if (host.includes("gmail.com")) {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+  }
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port,
     secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USER?.trim(),
-      pass: smtpPass(),
-    },
+    requireTLS: port === 587,
+    auth: { user, pass },
   });
 }
 
@@ -224,6 +232,13 @@ export async function sendTestEmail(to: string): Promise<{ ok: boolean; error: s
     });
     return { ok: true, error: null };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Send failed" };
+    const msg = err instanceof Error ? err.message : "Send failed";
+    const passLen = smtpPass().length;
+    const user = process.env.SMTP_USER?.trim() || "(missing)";
+    const hint =
+      /BadCredentials|Invalid login|535/i.test(msg)
+        ? ` | Fix: SMTP_USER must be the same Gmail that created the App Password (${user}). SMTP_PASS must be a 16-char App Password (now length=${passLen}; expected 16). Do not use your normal Gmail password. No quotes around the value in Vercel. Then Redeploy.`
+        : "";
+    return { ok: false, error: `${msg}${hint}` };
   }
 }

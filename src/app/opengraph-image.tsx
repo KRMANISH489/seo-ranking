@@ -15,8 +15,8 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 64,
-          background: "linear-gradient(135deg, #0b1117 0%, #15202b 50%, #1a1030 100%)",
-          color: "#f4f7fb",
+          background: "linear-gradient(145deg, #f8fafc 0%, #eef4ff 55%, #e8faf6 100%)",
+          color: "#0b1220",
           fontFamily: "system-ui, sans-serif",
         }}
       >
@@ -25,36 +25,29 @@ export default function OpenGraphImage() {
             style={{
               width: 56,
               height: 56,
-              borderRadius: 12,
-              border: "2px solid rgba(34,211,238,0.5)",
+              borderRadius: 16,
+              background: "linear-gradient(145deg, #0a84ff, #00b39a)",
               display: "flex",
-              alignItems: "center",
+              alignItems: "flex-end",
               justifyContent: "center",
-              fontSize: 22,
-              fontWeight: 700,
+              gap: 4,
+              paddingBottom: 14,
             }}
           >
-            <span style={{ display: "flex", color: "#22d3ee" }}>C</span>
-            <span style={{ display: "flex", color: "#a78bfa" }}>A</span>
+            <div style={{ width: 7, height: 12, background: "white", borderRadius: 2, opacity: 0.55 }} />
+            <div style={{ width: 7, height: 18, background: "white", borderRadius: 2, opacity: 0.8 }} />
+            <div style={{ width: 7, height: 26, background: "white", borderRadius: 2 }} />
           </div>
-          <div style={{ display: "flex", fontSize: 28, fontWeight: 700 }}>
-            <span style={{ color: "#22d3ee" }}>Cod</span>
-            <span>Abhi SEO</span>
+          <div style={{ display: "flex", fontSize: 30, fontWeight: 800 }}>
+            <span>CodAbhi</span>
+            <span style={{ marginLeft: 10, color: "#0a84ff" }}>SEO</span>
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              fontSize: 52,
-              fontWeight: 800,
-              lineHeight: 1.15,
-              maxWidth: 980,
-            }}
-          >
-            Weekly reports. Live Google rank. Continuous SEO monitoring.
+          <div style={{ display: "flex", fontSize: 52, fontWeight: 800, lineHeight: 1.12, maxWidth: 980 }}>
+            Rank tracking & weekly reports on autopilot
           </div>
-          <div style={{ display: "flex", fontSize: 24, color: "#8b9bb0", maxWidth: 900 }}>
+          <div style={{ display: "flex", fontSize: 24, color: "#5b6b7c", maxWidth: 900 }}>
             Automated SEO audit tool for agencies — white label client reports and SERP rank
             improvement.
           </div>

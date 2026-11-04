@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { DM_Sans, Syne } from "next/font/google";
+import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import { AppNav } from "@/components/AppNav";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
-const syne = Syne({
-  variable: "--font-syne",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
@@ -153,7 +153,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${syne.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <script

@@ -50,18 +50,35 @@ export function AnalyzerForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass animate-fade-up rounded-2xl p-3 sm:p-4">
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-3xl border border-[var(--line)] bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-5"
+    >
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p className="font-display text-sm font-bold tracking-tight text-[var(--text)]">
+            Run client SEO audit
+          </p>
+          <p className="mt-1 text-xs text-[var(--muted)]">
+            URL + email → live Google rank + weekly reports
+          </p>
+        </div>
+        <span className="rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
+          Live SERP
+        </span>
+      </div>
+
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="relative md:col-span-2">
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[var(--muted)]">
+        <div className="flex overflow-hidden rounded-[0.9rem] border border-[rgba(15,23,42,0.1)] bg-white focus-within:border-[rgba(10,132,255,0.55)] focus-within:shadow-[0_0_0_4px_rgba(10,132,255,0.12)] md:col-span-2">
+          <span className="flex shrink-0 items-center border-r border-[rgba(15,23,42,0.08)] bg-[var(--bg)] px-3 text-sm text-[var(--muted)] sm:px-4">
             https://
           </span>
           <input
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Client website URL"
-            className="w-full rounded-xl border border-transparent bg-[var(--bg)] px-4 py-3.5 pl-20 text-[15px] outline-none focus:border-[rgba(34,224,208,0.5)]"
+            placeholder="client-site.com"
+            className="min-w-0 flex-1 border-0 bg-transparent px-3 py-[0.9rem] text-[15px] text-[var(--text)] outline-none placeholder:text-[#94a3b8] sm:px-4"
             disabled={loading}
             required
           />
@@ -71,8 +88,8 @@ export function AnalyzerForm({
           type="email"
           value={clientEmail}
           onChange={(e) => setClientEmail(e.target.value)}
-          placeholder="Client email (required for reports)"
-          className="w-full rounded-xl border border-transparent bg-[var(--bg)] px-4 py-3.5 text-[15px] outline-none focus:border-[rgba(34,224,208,0.45)]"
+          placeholder="Client email for weekly reports"
+          className="input-seo"
           disabled={loading}
           required
         />
@@ -81,7 +98,7 @@ export function AnalyzerForm({
           value={clientName}
           onChange={(e) => setClientName(e.target.value)}
           placeholder="Client name (optional)"
-          className="w-full rounded-xl border border-transparent bg-[var(--bg)] px-4 py-3.5 text-[15px] outline-none focus:border-[rgba(34,224,208,0.45)]"
+          className="input-seo"
           disabled={loading}
         />
 
@@ -89,8 +106,8 @@ export function AnalyzerForm({
           type="text"
           value={keywords}
           onChange={(e) => setKeywords(e.target.value)}
-          placeholder="Target keywords for Google rank (comma separated)"
-          className="w-full rounded-xl border border-transparent bg-[var(--bg)] px-4 py-3.5 text-[15px] outline-none focus:border-[rgba(34,224,208,0.45)] md:col-span-2"
+          placeholder="Target keywords (comma separated)"
+          className="input-seo md:col-span-2"
           disabled={loading}
         />
       </div>
@@ -98,19 +115,35 @@ export function AnalyzerForm({
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-[var(--muted)]">
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={weeklyMonitor} onChange={(e) => setWeeklyMonitor(e.target.checked)} />
-            Weekly auto-check + email
+            <input
+              type="checkbox"
+              checked={weeklyMonitor}
+              onChange={(e) => setWeeklyMonitor(e.target.checked)}
+            />
+            Weekly reports
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={checkRank} onChange={(e) => setCheckRank(e.target.checked)} />
-            Live Google rank
+            <input
+              type="checkbox"
+              checked={checkRank}
+              onChange={(e) => setCheckRank(e.target.checked)}
+            />
+            Google rank
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={deepCrawl} onChange={(e) => setDeepCrawl(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={deepCrawl}
+              onChange={(e) => setDeepCrawl(e.target.checked)}
+            />
             Crawl
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={pageSpeed} onChange={(e) => setPageSpeed(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={pageSpeed}
+              onChange={(e) => setPageSpeed(e.target.checked)}
+            />
             PageSpeed
           </label>
           <label className="flex items-center gap-2">
@@ -126,16 +159,11 @@ export function AnalyzerForm({
         <button
           type="submit"
           disabled={loading || !url.trim() || !clientEmail.trim()}
-          className="btn-brand rounded-xl px-6 py-3.5 transition disabled:cursor-not-allowed disabled:opacity-50"
+          className="btn-brand shrink-0 rounded-2xl px-6 py-3.5 text-sm transition disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Running pro audit…" : "Start audit + monitoring"}
+          {loading ? "Auditing…" : "Start SEO audit"}
         </button>
       </div>
-
-      <p className="mt-3 px-1 text-xs text-[var(--muted)]">
-        Weekly reports email the client inbox. Continuous SEO monitoring stays ON until you pause it
-        from the agency dashboard.
-      </p>
     </form>
   );
 }
