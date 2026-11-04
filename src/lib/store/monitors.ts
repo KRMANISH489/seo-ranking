@@ -1,6 +1,5 @@
-import path from "path";
 import { randomUUID } from "crypto";
-import { dataDir, ensureDataDir, readJsonFile, writeJsonFile } from "./paths";
+import { loadJson, persistJson, storageMode } from "./persist";
 
 export interface MonitorSite {
   id: string;
@@ -19,31 +18,14 @@ export interface MonitorSite {
   notes?: string;
 }
 
-function filePath() {
-  return path.join(dataDir(), "monitors.json");
-}
-
-async function ensure() {
-  await ensureDataDir();
-  const file = filePath();
-  const existing = await readJsonFile<MonitorSite[] | null>(file, null);
-  if (existing === null) {
-    await writeJsonFile(file, []);
-  }
-}
+const FILE = "monitors.json";
 
 async function readAll(): Promise<MonitorSite[]> {
-  try {
-    await ensure();
-    return await readJsonFile<MonitorSite[]>(filePath(), []);
-  } catch {
-    return [];
-  }
+  return loadJson<MonitorSite[]>(FILE, []);
 }
 
 async function writeAll(items: MonitorSite[]) {
-  await ensure();
-  await writeJsonFile(filePath(), items);
+  await persistJson(FILE, items);
 }
 
 export async function listMonitors(): Promise<MonitorSite[]> {
@@ -75,7 +57,10 @@ export async function upsertMonitor(input: {
 
   const now = new Date().toISOString();
   if (existing) {
-    existing.keywords = [...new Set(input.keywords.map((k) => k.trim()).filter(Boolean))].slice(0, 5);
+    existing.keywords = [...new Set(input.keywords.map((k) => k.trim()).filter(Boolean))].slice(
+      0,
+      5
+    );
     existing.clientName = input.clientName || existing.clientName;
     existing.active = input.active ?? true;
     existing.updatedAt = now;
@@ -139,4 +124,8 @@ export async function deleteMonitor(id: string): Promise<boolean> {
   const all = await readAll();
   await writeAll(all.filter((m) => m.id !== id));
   return true;
+}
+
+export function getMonitorStorageMode() {
+  return storageMode();
 }

@@ -1,49 +1,24 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { randomUUID } from "crypto";
 import type { AuditListItem, CompareResult, ProAuditResult } from "@/lib/seo/proTypes";
-import { dataDir, ensureDataDir, readJsonFile, writeJsonFile } from "./paths";
+import { listJsonKeys, loadJson, persistJson, removeJson, storageMode } from "./persist";
 
-function auditsDir() {
-  return path.join(dataDir(), "audits");
-}
-function compareDir() {
-  return path.join(dataDir(), "compares");
-}
-function indexFile() {
-  return path.join(dataDir(), "index.json");
-}
-
-async function ensureDirs() {
-  await ensureDataDir("audits", "compares");
-  const idx = indexFile();
-  try {
-    await fs.access(idx);
-  } catch {
-    await writeJsonFile(idx, []);
-  }
-}
+const INDEX_KEY = "index.json";
 
 async function readIndex(): Promise<AuditListItem[]> {
-  try {
-    await ensureDirs();
-    return await readJsonFile<AuditListItem[]>(indexFile(), []);
-  } catch {
-    return [];
-  }
+  return loadJson<AuditListItem[]>(INDEX_KEY, []);
 }
 
 async function writeIndex(items: AuditListItem[]) {
-  await ensureDirs();
-  await writeJsonFile(indexFile(), items);
+  await persistJson(INDEX_KEY, items);
 }
 
-export async function saveAudit(audit: Omit<ProAuditResult, "id"> & { id?: string }): Promise<ProAuditResult> {
-  await ensureDirs();
+export async function saveAudit(
+  audit: Omit<ProAuditResult, "id"> & { id?: string }
+): Promise<ProAuditResult> {
   const id = audit.id || randomUUID();
   const full: ProAuditResult = { ...audit, id };
 
-  await writeJsonFile(path.join(auditsDir(), `${id}.json`), full);
+  await persistJson(`audits/${id}.json`, full);
 
   const index = await readIndex();
   const item: AuditListItem = {
@@ -61,53 +36,60 @@ export async function saveAudit(audit: Omit<ProAuditResult, "id"> & { id?: strin
 }
 
 export async function listAudits(): Promise<AuditListItem[]> {
-  return readIndex();
+  const index = await readIndex();
+  if (index.length > 0) return index;
+
+  // Rebuild index from blob/fs if index was lost but audit files remain
+  const keys = await listJsonKeys("audits/");
+  if (!keys.length) return [];
+
+  const rebuilt: AuditListItem[] = [];
+  for (const key of keys.slice(0, 200)) {
+    const full = await loadJson<ProAuditResult | null>(key, null);
+    if (!full?.id) continue;
+    rebuilt.push({
+      id: full.id,
+      url: full.url,
+      overallScore: full.overallScore,
+      grade: full.grade,
+      analyzedAt: full.analyzedAt,
+      primaryKeyword: full.ai?.primaryKeyword ?? null,
+      summary: (full.summary || "").slice(0, 180),
+    });
+  }
+  rebuilt.sort((a, b) => +new Date(b.analyzedAt) - +new Date(a.analyzedAt));
+  if (rebuilt.length) await writeIndex(rebuilt);
+  return rebuilt;
 }
 
 export async function getAudit(id: string): Promise<ProAuditResult | null> {
-  try {
-    await ensureDirs();
-    const raw = await fs.readFile(path.join(auditsDir(), `${id}.json`), "utf8");
-    return JSON.parse(raw) as ProAuditResult;
-  } catch {
-    return null;
-  }
+  return loadJson<ProAuditResult | null>(`audits/${id}.json`, null);
 }
 
 export async function deleteAudit(id: string): Promise<boolean> {
-  try {
-    await ensureDirs();
-    try {
-      await fs.unlink(path.join(auditsDir(), `${id}.json`));
-    } catch {
-      // ignore missing file
-    }
-    const index = await readIndex();
-    await writeIndex(index.filter((x) => x.id !== id));
-  } catch {
-    // ignore persistence errors on read-only hosts
-  }
+  await removeJson(`audits/${id}.json`);
+  const index = await readIndex();
+  await writeIndex(index.filter((x) => x.id !== id));
   return true;
 }
 
-export async function saveCompare(compare: Omit<CompareResult, "id" | "createdAt"> & { id?: string }): Promise<CompareResult> {
-  await ensureDirs();
+export async function saveCompare(
+  compare: Omit<CompareResult, "id" | "createdAt"> & { id?: string }
+): Promise<CompareResult> {
   const id = compare.id || randomUUID();
   const full: CompareResult = {
     ...compare,
     id,
     createdAt: new Date().toISOString(),
   };
-  await writeJsonFile(path.join(compareDir(), `${id}.json`), full);
+  await persistJson(`compares/${id}.json`, full);
   return full;
 }
 
 export async function getCompare(id: string): Promise<CompareResult | null> {
-  try {
-    await ensureDirs();
-    const raw = await fs.readFile(path.join(compareDir(), `${id}.json`), "utf8");
-    return JSON.parse(raw) as CompareResult;
-  } catch {
-    return null;
-  }
+  return loadJson<CompareResult | null>(`compares/${id}.json`, null);
+}
+
+export function getStorageMode() {
+  return storageMode();
 }

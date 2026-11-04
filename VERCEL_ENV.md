@@ -2,6 +2,15 @@
 
 Live site: `https://seo-ranking-sigma.vercel.app`
 
+## 0) Persistent storage (History + Admin) — required
+
+Vercel `/tmp` is wiped between deploys, so audits disappear unless you add Blob:
+
+1. Vercel project → **Storage** → **Create** → **Blob**  
+2. Connect to `seo-ranking` (adds `BLOB_READ_WRITE_TOKEN` automatically)  
+3. Redeploy  
+4. Run a new audit — it will stay in History / Admin
+
 ## 1) Email via Resend (recommended)
 
 Gmail SMTP often fails with `535 BadCredentials` on Vercel. Use Resend instead:

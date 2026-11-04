@@ -8,6 +8,7 @@ export default function HistoryPage() {
   const [audits, setAudits] = useState<AuditListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [storageHint, setStorageHint] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -15,6 +16,7 @@ export default function HistoryPage() {
       const res = await fetch("/api/audits");
       const data = await res.json();
       setAudits(data.audits || []);
+      setStorageHint(typeof data.hint === "string" ? data.hint : null);
     } catch {
       setError("Could not load history.");
     } finally {
@@ -38,7 +40,16 @@ export default function HistoryPage() {
         <p className="mt-2 text-[var(--muted)]">Saved professional reports — reopen or export PDF anytime.</p>
 
         {loading && <p className="mt-8 text-sm text-[var(--muted)]">Loading…</p>}
-        {error && <p className="mt-8 text-sm text-rose-300">{error}</p>}
+        {error && <p className="mt-8 text-sm text-rose-600">{error}</p>}
+        {storageHint && (
+          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <p className="font-semibold">History may reset on Vercel</p>
+            <p className="mt-1">{storageHint}</p>
+            <p className="mt-2 text-xs">
+              Vercel Dashboard → Storage → Create Blob Store → connect this project → Redeploy.
+            </p>
+          </div>
+        )}
 
         {!loading && audits.length === 0 && (
           <div className="glass mt-8 rounded-2xl p-8 text-center">

@@ -11,6 +11,7 @@ function SettingsInner() {
     smtpUser?: string | null;
     serpConfigured?: boolean;
   }>({});
+  const [storage, setStorage] = useState<"blob" | "filesystem" | null>(null);
   const [testMsg, setTestMsg] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
 
@@ -19,6 +20,10 @@ function SettingsInner() {
       .then((r) => r.json())
       .then((d) => setStatus(d.status || {}))
       .catch(() => undefined);
+    fetch("/api/audits")
+      .then((r) => r.json())
+      .then((d) => setStorage(d.storage === "blob" ? "blob" : "filesystem"))
+      .catch(() => setStorage("filesystem"));
   }, []);
 
   async function sendTest() {
@@ -37,6 +42,14 @@ function SettingsInner() {
   }
 
   const rows = [
+    {
+      name: "Persistent storage (Blob)",
+      ok: storage === "blob",
+      hint:
+        storage === "blob"
+          ? "Vercel Blob connected — History/Admin will persist"
+          : "Create Blob Store in Vercel Storage (BLOB_READ_WRITE_TOKEN)",
+    },
     {
       name: "Gemini AI",
       ok: true,
