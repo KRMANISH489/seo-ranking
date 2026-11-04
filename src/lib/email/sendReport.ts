@@ -7,11 +7,22 @@ function getAdminEmail(): string | null {
 }
 
 function smtpPass(): string {
-  // Gmail App Passwords are often copied with spaces
   return (process.env.SMTP_PASS || "").replace(/\s+/g, "");
 }
 
-function isEmailConfigured(): boolean {
+function resendKey(): string {
+  return process.env.RESEND_API_KEY?.trim() || "";
+}
+
+function fromAddress(): string {
+  return (
+    process.env.EMAIL_FROM?.trim() ||
+    process.env.SMTP_FROM?.trim() ||
+    "CodAbhi SEO <onboarding@resend.dev>"
+  );
+}
+
+function isSmtpConfigured(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
       process.env.SMTP_USER?.trim() &&
@@ -20,11 +31,14 @@ function isEmailConfigured(): boolean {
   );
 }
 
+function isEmailConfigured(): boolean {
+  return Boolean(resendKey()) || isSmtpConfigured();
+}
+
 function transporter() {
   const port = Number(process.env.SMTP_PORT || 587);
   const user = process.env.SMTP_USER?.trim();
   const pass = smtpPass();
-  // Prefer Gmail service preset (TLS + auth) when using smtp.gmail.com
   const host = (process.env.SMTP_HOST || "").trim().toLowerCase();
   if (host.includes("gmail.com")) {
     return nodemailer.createTransport({
@@ -38,6 +52,45 @@ function transporter() {
     secure: port === 465,
     requireTLS: port === 587,
     auth: { user, pass },
+  });
+}
+
+async function deliverMail(opts: {
+  to: string;
+  subject: string;
+  html: string;
+}): Promise<void> {
+  const from = fromAddress();
+  const key = resendKey();
+
+  // Prefer Resend — more reliable on Vercel than Gmail SMTP
+  if (key) {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [opts.to],
+        subject: opts.subject,
+        html: opts.html,
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Resend ${res.status}: ${body.slice(0, 280)}`);
+    }
+    return;
+  }
+
+  const tx = transporter();
+  await tx.sendMail({
+    from,
+    to: opts.to,
+    subject: opts.subject,
+    html: opts.html,
   });
 }
 
@@ -57,8 +110,8 @@ function rankRows(ranking?: RankingReport | null): string {
     .join("");
   return `<table style="border-collapse:collapse;width:100%;font-size:14px;">
     <thead><tr>
-      <th style="text-align:left;padding:8px;border:1px solid #e5e7eb;background:#f8fafc;">Keyword</th>
-      <th style="text-align:left;padding:8px;border:1px solid #e5e7eb;background:#f8fafc;">Google Rank</th>
+      <th style="text-align:left;padding:8px;border:1px solid #e5e7eb;">Keyword</th>
+      <th style="text-align:left;padding:8px;border:1px solid #e5e7eb;">Google position</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
@@ -79,55 +132,40 @@ function buildHtml(opts: {
   appBaseUrl: string;
 }): string {
   const { audit, audience, isWeekly, appBaseUrl } = opts;
-  const tips = audit.ranking ? rankingSpeedTips(audit.ranking) : [];
+  const tips = rankingSpeedTips(audit.ranking);
+  const tipHtml = tips.map((t) => `<li>${escapeHtml(t)}</li>`).join("");
   const reportUrl = `${appBaseUrl}/report/${audit.id}`;
   const pdfUrl = `${appBaseUrl}/api/audits/${audit.id}/pdf`;
-  const title = isWeekly ? "Weekly SEO Rank Report" : "SEO Audit Report";
+  const best =
+    audit.ranking?.bestPosition != null ? `#${audit.ranking.bestPosition}` : "n/a";
 
-  return `<!DOCTYPE html>
-<html><body style="font-family:Arial,sans-serif;background:#0b1117;color:#f4f7fb;margin:0;padding:24px;">
-  <div style="max-width:640px;margin:0 auto;background:#101820;border-radius:16px;padding:28px;border:1px solid #243041;">
+  return `<!DOCTYPE html><html><body style="margin:0;background:#0b1117;color:#f4f7fb;font-family:Arial,sans-serif;">
+  <div style="max-width:640px;margin:0 auto;padding:28px;">
     <p style="color:#22d3ee;letter-spacing:2px;font-size:12px;font-weight:700;text-transform:uppercase;">CodAbhi SEO</p>
-    <h1 style="margin:8px 0 4px;font-size:24px;color:#fff;">${title}</h1>
+    <h1 style="font-size:26px;margin:8px 0 6px;">${isWeekly ? "Weekly" : "Audit"} report</h1>
     <p style="color:#94a3b8;font-size:14px;">For ${audience === "admin" ? "Admin" : "Client"} · ${new Date(audit.analyzedAt).toLocaleString()}</p>
-    <p style="color:#cbd5e1;font-size:14px;word-break:break-all;">${escapeHtml(audit.url)}</p>
+    <p style="margin:18px 0 8px;"><a href="${escapeHtml(audit.url)}" style="color:#22d3ee;">${escapeHtml(audit.url)}</a></p>
 
-    <div style="display:flex;gap:16px;margin:24px 0;">
-      <div style="background:#0b1117;border-radius:12px;padding:16px;flex:1;border:1px solid rgba(34,224,208,0.25);">
-        <div style="color:#8b9bb0;font-size:12px;">SEO Score</div>
+    <div style="display:flex;gap:12px;margin:20px 0;">
+      <div style="flex:1;background:#15202b;border-radius:12px;padding:16px;">
+        <div style="font-size:12px;color:#94a3b8;">SEO score</div>
         <div style="font-size:36px;font-weight:700;color:#22d3ee;">${audit.overallScore}</div>
-        <div style="color:#8b9bb0;">Grade ${audit.grade}</div>
+        <div style="color:#a78bfa;">Grade ${escapeHtml(audit.grade)}</div>
       </div>
-      <div style="background:#0b1117;border-radius:12px;padding:16px;flex:1;border:1px solid rgba(167,139,250,0.25);">
-        <div style="color:#8b9bb0;font-size:12px;">Best Google Rank</div>
-        <div style="font-size:36px;font-weight:700;color:#a78bfa;">${
-          audit.ranking?.bestPosition != null ? "#" + audit.ranking.bestPosition : "—"
-        }</div>
-        <div style="color:#94a3b8;">Live SERP check</div>
+      <div style="flex:1;background:#15202b;border-radius:12px;padding:16px;">
+        <div style="font-size:12px;color:#94a3b8;">Best Google rank</div>
+        <div style="font-size:36px;font-weight:700;color:#a78bfa;">${best}</div>
+        <div style="color:#94a3b8;font-size:13px;">Live SERP check</div>
       </div>
     </div>
 
-    <p style="color:#cbd5e1;line-height:1.5;">${escapeHtml(audit.summary)}</p>
-    ${audit.ranking ? `<p style="color:#94a3b8;font-size:13px;">${escapeHtml(audit.ranking.summary)}</p>` : ""}
-
-    <h2 style="color:#fff;font-size:16px;margin-top:28px;">Google keyword ranks</h2>
-    <div style="background:#fff;color:#0f172a;border-radius:12px;padding:8px;margin-top:8px;">
+    <h2 style="font-size:18px;margin-top:24px;">Keyword ranks</h2>
+    <div style="background:#fff;color:#0f172a;border-radius:12px;padding:8px;overflow:auto;">
       ${rankRows(audit.ranking)}
     </div>
 
-    <h2 style="color:#fff;font-size:16px;margin-top:28px;">Fastest path to better ranking</h2>
-    <ol style="color:#cbd5e1;padding-left:18px;line-height:1.6;">
-      ${tips.map((t) => `<li>${escapeHtml(t)}</li>`).join("") || "<li>Complete on-page P0 fixes from the full report.</li>"}
-    </ol>
-
-    <h2 style="color:#fff;font-size:16px;margin-top:28px;">Priority fixes (P0)</h2>
-    <ul style="color:#cbd5e1;padding-left:18px;line-height:1.6;">
-      ${audit.priorityActions
-        .filter((a) => a.level === "P0")
-        .slice(0, 6)
-        .map((a) => `<li><strong>${escapeHtml(a.title)}</strong> — ${escapeHtml(a.detail)}</li>`)
-        .join("") || "<li>No critical P0 items.</li>"}
-    </ul>
+    <h2 style="font-size:18px;margin-top:24px;">Rank improvement tips</h2>
+    <ul style="color:#cbd5e1;line-height:1.6;">${tipHtml || "<li>Keep monitoring weekly.</li>"}</ul>
 
     <div style="margin-top:28px;">
       <a href="${pdfUrl}" style="display:inline-block;background:#22d3ee;color:#041516;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700;margin-right:10px;">Download PDF</a>
@@ -153,14 +191,13 @@ export async function sendAuditEmails(opts: {
     return {
       sent: [],
       skipped:
-        "Email not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM (and ADMIN_EMAIL).",
+        "Email not configured. Set RESEND_API_KEY (recommended) or SMTP_HOST/USER/PASS/FROM, plus ADMIN_EMAIL.",
       error: null,
     };
   }
 
   const sent: string[] = [];
   try {
-    const tx = transporter();
     const isWeekly = Boolean(opts.isWeekly);
 
     const clientHtml = buildHtml({
@@ -169,8 +206,7 @@ export async function sendAuditEmails(opts: {
       isWeekly,
       appBaseUrl,
     });
-    await tx.sendMail({
-      from: process.env.SMTP_FROM,
+    await deliverMail({
       to: opts.clientEmail,
       subject: `${isWeekly ? "[Weekly]" : "[Audit]"} CodAbhi SEO · Score ${opts.audit.overallScore} · ${opts.audit.url}`,
       html: clientHtml,
@@ -184,8 +220,7 @@ export async function sendAuditEmails(opts: {
         isWeekly,
         appBaseUrl,
       });
-      await tx.sendMail({
-        from: process.env.SMTP_FROM,
+      await deliverMail({
         to: admin,
         subject: `${isWeekly ? "[Weekly Admin]" : "[Audit Admin]"} ${opts.audit.url} · Score ${opts.audit.overallScore} · Best rank ${opts.audit.ranking?.bestPosition ?? "n/a"}`,
         html: adminHtml,
@@ -204,8 +239,10 @@ export async function sendAuditEmails(opts: {
 }
 
 export function emailStatus() {
+  const usingResend = Boolean(resendKey());
   return {
     smtpConfigured: isEmailConfigured(),
+    emailProvider: usingResend ? "resend" : isSmtpConfigured() ? "smtp" : null,
     adminEmail: getAdminEmail(),
     smtpUser: process.env.SMTP_USER?.trim() || null,
     serpConfigured: Boolean(process.env.SERPER_API_KEY || process.env.SERPAPI_KEY),
@@ -216,29 +253,29 @@ export async function sendTestEmail(to: string): Promise<{ ok: boolean; error: s
   if (!isEmailConfigured()) {
     return {
       ok: false,
-      error: "SMTP not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM.",
+      error:
+        "Email not configured. Recommended: set RESEND_API_KEY from https://resend.com (free). Or fix Gmail SMTP_PASS App Password.",
     };
   }
   try {
-    const tx = transporter();
-    await tx.sendMail({
-      from: process.env.SMTP_FROM,
+    const provider = resendKey() ? "Resend" : "SMTP";
+    await deliverMail({
       to,
       subject: "CodAbhi SEO — test email OK",
-      html: `<div style="font-family:Arial,sans-serif;padding:20px;background:#0b1117;color:#f4f7fb">
-        <h2 style="color:#22d3ee">CodAbhi SEO</h2>
-        <p>SMTP is working. Audit reports can now email client + admin.</p>
+      html: `<div style="font-family:Arial,sans-serif;padding:20px;background:#f3f5f8;color:#0b1220">
+        <h2 style="color:#0a84ff">CodAbhi SEO</h2>
+        <p>${provider} is working. Audit reports can now email client + admin.</p>
       </div>`,
     });
     return { ok: true, error: null };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Send failed";
-    const passLen = smtpPass().length;
-    const user = process.env.SMTP_USER?.trim() || "(missing)";
-    const hint =
-      /BadCredentials|Invalid login|535/i.test(msg)
-        ? ` | Fix: SMTP_USER must be the same Gmail that created the App Password (${user}). SMTP_PASS must be a 16-char App Password (now length=${passLen}; expected 16). Do not use your normal Gmail password. No quotes around the value in Vercel. Then Redeploy.`
-        : "";
-    return { ok: false, error: `${msg}${hint}` };
+    if (/BadCredentials|Invalid login|535/i.test(msg)) {
+      return {
+        ok: false,
+        error: `${msg} | Gmail App Password invalid. Easier fix: create free key at https://resend.com → set RESEND_API_KEY on Vercel → Redeploy. Optional EMAIL_FROM=CodAbhi SEO <onboarding@resend.dev> for testing.`,
+      };
+    }
+    return { ok: false, error: msg };
   }
 }

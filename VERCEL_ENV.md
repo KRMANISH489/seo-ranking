@@ -2,25 +2,27 @@
 
 Live site: `https://seo-ranking-sigma.vercel.app`
 
-## 1) Gmail App Password (required for reports)
+## 1) Email via Resend (recommended)
 
-1. Open https://myaccount.google.com/security  
-2. Enable **2-Step Verification**  
-3. Open https://myaccount.google.com/apppasswords  
-4. Create password for app **Mail**  
-5. Copy the 16-character password (spaces optional)
+Gmail SMTP often fails with `535 BadCredentials` on Vercel. Use Resend instead:
 
-## 2) Vercel → Settings → Environment Variables
+1. https://resend.com → sign up → **API Keys** → Create  
+2. Add on Vercel:
+
+| Name | Value |
+|------|--------|
+| `RESEND_API_KEY` | `re_...` |
+| `EMAIL_FROM` | `CodAbhi SEO <onboarding@resend.dev>` (testing) |
+| `ADMIN_EMAIL` | `krmanish489@gmail.com` |
+
+For production client emails, verify your domain in Resend and set `EMAIL_FROM` to that domain.
+
+## 2) Other Vercel Environment Variables
 
 Add for **Production** (+ Preview recommended):
 
 | Name | Value |
 |------|--------|
-| `SMTP_HOST` | `smtp.gmail.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_USER` | `krmanish489@gmail.com` |
-| `SMTP_PASS` | *(Gmail App Password)* |
-| `SMTP_FROM` | `CodAbhi SEO <krmanish489@gmail.com>` |
 | `ADMIN_EMAIL` | `krmanish489@gmail.com` |
 | `APP_BASE_URL` | `https://seo-ranking-sigma.vercel.app` |
 | `ADMIN_PASSWORD` | `admin123` |

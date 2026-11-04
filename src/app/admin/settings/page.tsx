@@ -6,6 +6,7 @@ import { AdminGate } from "@/components/admin/AdminGate";
 function SettingsInner() {
   const [status, setStatus] = useState<{
     smtpConfigured?: boolean;
+    emailProvider?: string | null;
     adminEmail?: string | null;
     smtpUser?: string | null;
     serpConfigured?: boolean;
@@ -47,11 +48,11 @@ function SettingsInner() {
       hint: "SERPER_API_KEY — live #position",
     },
     {
-      name: "SMTP email",
+      name: "Email delivery",
       ok: Boolean(status.smtpConfigured),
-      hint: status.smtpUser
-        ? `From ${status.smtpUser}`
-        : "Set SMTP_HOST / USER / PASS / FROM",
+      hint: status.emailProvider
+        ? `Provider: ${status.emailProvider}${status.smtpUser ? ` · ${status.smtpUser}` : ""}`
+        : "Set RESEND_API_KEY (recommended) or Gmail SMTP",
     },
     {
       name: "Admin email CC",
@@ -126,8 +127,44 @@ function SettingsInner() {
         </div>
       ) : null}
 
+      <div className="mt-8 space-y-3 rounded-2xl border border-[rgba(10,132,255,0.25)] bg-[rgba(10,132,255,0.06)] p-5 text-sm text-[var(--muted)]">
+        <p className="font-semibold text-[var(--text)]">Recommended: Resend (fixes 535 BadCredentials)</p>
+        <ol className="list-decimal space-y-2 pl-5">
+          <li>
+            Create free account at{" "}
+            <a
+              href="https://resend.com"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-[var(--accent)] hover:underline"
+            >
+              resend.com
+            </a>{" "}
+            → API Keys → Create
+          </li>
+          <li>
+            Vercel env: <code className="text-[var(--accent)]">RESEND_API_KEY=re_...</code>
+          </li>
+          <li>
+            Optional:{" "}
+            <code className="text-[var(--accent)]">
+              EMAIL_FROM=CodAbhi SEO &lt;onboarding@resend.dev&gt;
+            </code>{" "}
+            (works for testing without a custom domain)
+          </li>
+          <li>
+            Keep <code className="text-[var(--accent)]">ADMIN_EMAIL</code> = your inbox → Redeploy →
+            Send test email
+          </li>
+        </ol>
+        <p className="text-xs">
+          Free Resend can send to your own email with <code>onboarding@resend.dev</code>. For client
+          domains later, verify a domain in Resend.
+        </p>
+      </div>
+
       <div className="mt-8 space-y-4 rounded-2xl border border-[var(--line)] bg-white p-5 text-sm text-[var(--muted)] shadow-sm">
-        <p className="font-semibold text-[var(--text)]">Gmail SMTP setup (email reports)</p>
+        <p className="font-semibold text-[var(--text)]">Optional: Gmail SMTP setup</p>
         <ol className="list-decimal space-y-2 pl-5">
           <li>
             Google Account →{" "}
