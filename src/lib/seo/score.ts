@@ -31,13 +31,17 @@ export function computeScores(issues: SeoIssue[]): {
     }
 
     let score = 100;
+    let criticalHits = 0;
     for (const issue of related) {
-      if (issue.severity === "critical") score -= 28;
-      else if (issue.severity === "warning") score -= 12;
-      else if (issue.severity === "info") score -= 4;
+      if (issue.severity === "critical") {
+        criticalHits += 1;
+        // Diminishing penalties so 4× stuffing doesn't force Content to 0
+        score -= criticalHits <= 2 ? 18 : 8;
+      } else if (issue.severity === "warning") score -= 10;
+      else if (issue.severity === "info") score -= 3;
       else if (issue.severity === "pass") score += 0;
     }
-    score = Math.max(0, Math.min(100, score));
+    score = Math.max(12, Math.min(100, score));
     return { category, score, maxScore: 100, weight };
   });
 

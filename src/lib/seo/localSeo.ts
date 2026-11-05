@@ -87,16 +87,38 @@ function extractQueryFromGbpUrl(raw: string): string | null {
   }
 }
 
-function pickBestPlace(places: SerperPlace[], siteUrl: string): SerperPlace | null {
-  if (!places.length) return null;
+function pickBestPlace(
+  places: SerperPlace[],
+  siteUrl: string
+): { place: SerperPlace | null; reason: string | null } {
+  if (!places.length) return { place: null, reason: "No Maps results." };
   const siteHost = hostnameOf(siteUrl);
   const withSite = places.find((p) => p.website && hostnameOf(p.website) === siteHost);
-  if (withSite) return withSite;
-  const withSiteLoose = places.find(
-    (p) => p.website && hostnameOf(p.website).includes(siteHost.split(".")[0] || siteHost)
+  if (withSite) return { place: withSite, reason: null };
+
+  const brand = siteHost.split(".")[0] || siteHost;
+  const withSiteLoose = places.find((p) => {
+    if (!p.website || brand.length < 4) return false;
+    const host = hostnameOf(p.website);
+    return host.includes(brand) || brand.includes(host.split(".")[0] || "");
+  });
+  if (withSiteLoose) return { place: withSiteLoose, reason: null };
+
+  // Never attach an unrelated listing (e.g. city gov site) to this audit URL
+  const foreignWebsite = places.some(
+    (p) => p.website && hostnameOf(p.website) !== siteHost
   );
-  if (withSiteLoose) return withSiteLoose;
-  return places[0];
+  if (foreignWebsite) {
+    return {
+      place: null,
+      reason:
+        `No Google Business Profile matched website “${siteHost}”. ` +
+        "Enter the exact business name + city, or paste the Google Maps / GBP share link.",
+    };
+  }
+
+  // Results have no websites — weak candidate only
+  return { place: places[0], reason: null };
 }
 
 function toListing(place: SerperPlace, query: string): LocalSeoListing {
@@ -338,16 +360,16 @@ export async function buildLocalSeoReport(opts: LocalSeoOptions): Promise<LocalS
       });
     }
 
-    const best = pickBestPlace(places, opts.siteUrl);
-    if (!best) {
+    const picked = pickBestPlace(places, opts.siteUrl);
+    if (!picked.place) {
       return emptyReport({
         enabled: true,
-        error: "Maps returned results but none could be parsed.",
+        error: picked.reason || "Maps returned results but none could be parsed.",
         query,
       });
     }
 
-    const listing = toListing(best, query);
+    const listing = toListing(picked.place, query);
     const scored = scoreListing(listing, opts.siteUrl, opts.pageText);
 
     return {

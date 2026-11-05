@@ -272,10 +272,15 @@ export function mergeAiIntoKeywords(
   };
 }
 
-export function aiIssues(ai: AiInsight): SeoIssue[] {
+export function aiIssues(ai: AiInsight, existing: SeoIssue[] = []): SeoIssue[] {
   if (!ai.enabled || ai.error) return [];
 
   const issues: SeoIssue[] = [];
+  const covered = new Set(
+    existing
+      .map((i) => i.title.toLowerCase())
+      .concat(existing.map((i) => (i.currentValue || "").toLowerCase()))
+  );
 
   if (ai.primaryKeyword) {
     issues.push({
@@ -291,10 +296,13 @@ export function aiIssues(ai: AiInsight): SeoIssue[] {
   for (const v of ai.keywordVerdicts
     .filter((x) => x.verdict === "bad" || x.verdict === "stuffed")
     .slice(0, 5)) {
+    const key = v.keyword.toLowerCase();
+    // Skip duplicates already flagged by on-page keyword engine
+    if ([...covered].some((c) => c.includes(key))) continue;
     issues.push({
       id: `ai-kw-${v.verdict}-${v.keyword}`,
       category: "Content",
-      severity: v.verdict === "stuffed" ? "critical" : "warning",
+      severity: "warning",
       title: `AI says ${v.verdict}: "${v.keyword}"`,
       message: v.reason,
       recommendation: v.betterAlternative

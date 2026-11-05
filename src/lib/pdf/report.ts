@@ -130,7 +130,9 @@ export async function buildAuditPdf(audit: ProAuditResult): Promise<Buffer> {
   doc.text(summaryLines, margin, y);
   y += summaryLines.length * 11 + 14;
 
-  if (audit.ai.strategistSummary) {
+  const strategist = (audit.ai.strategistSummary || "").trim();
+  const baseSummary = (audit.summary || "").trim();
+  if (strategist && strategist.toLowerCase() !== baseSummary.toLowerCase()) {
     y = ensureSpace(doc, y, 60);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...BRAND.ink);
@@ -138,7 +140,7 @@ export async function buildAuditPdf(audit: ProAuditResult): Promise<Buffer> {
     y += 12;
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...BRAND.muted);
-    const aiLines = doc.splitTextToSize(audit.ai.strategistSummary, 515);
+    const aiLines = doc.splitTextToSize(strategist, 515);
     doc.text(aiLines, margin, y);
     y += aiLines.length * 11 + 14;
   }
@@ -382,33 +384,39 @@ export async function buildAuditPdf(audit: ProAuditResult): Promise<Buffer> {
     doc.setTextColor(...BRAND.muted);
 
     if (audit.localSeo.error) {
-      doc.text(audit.localSeo.error.slice(0, 110), margin, y);
-      y += 14;
+      const errLines = doc.splitTextToSize(audit.localSeo.error, 515);
+      y = ensureSpace(doc, y, errLines.length * 11 + 10);
+      doc.text(errLines, margin, y);
+      y += errLines.length * 11 + 10;
     } else if (audit.localSeo.listing) {
       const L = audit.localSeo.listing;
-      doc.text(
+      const head = doc.splitTextToSize(
         `${L.name || "Listing"} · Score ${audit.localSeo.score ?? "—"} (${audit.localSeo.grade ?? "—"}) · Rating ${L.rating ?? "—"} (${L.reviewCount ?? 0} reviews)`,
-        margin,
-        y
+        515
       );
-      y += 12;
+      doc.text(head, margin, y);
+      y += head.length * 11 + 4;
       if (L.address) {
-        doc.text(`Address: ${L.address}`.slice(0, 110), margin, y);
-        y += 12;
+        const addr = doc.splitTextToSize(`Address: ${L.address}`, 515);
+        y = ensureSpace(doc, y, addr.length * 11 + 4);
+        doc.text(addr, margin, y);
+        y += addr.length * 11 + 4;
       }
-      doc.text(
+      const contact = doc.splitTextToSize(
         `Phone: ${L.phone || "—"} · Website: ${L.website || "missing"} · Category: ${L.category || "—"}`,
-        margin,
-        y
+        515
       );
-      y += 14;
+      y = ensureSpace(doc, y, contact.length * 11 + 8);
+      doc.text(contact, margin, y);
+      y += contact.length * 11 + 8;
       const localIssues = audit.localSeo.issues.filter(
         (i) => i.severity === "critical" || i.severity === "warning"
       );
       for (const issue of localIssues.slice(0, 6)) {
-        y = ensureSpace(doc, y, 20);
-        doc.text(`• ${issue.title}: ${issue.detail}`.slice(0, 110), margin, y);
-        y += 12;
+        const line = doc.splitTextToSize(`• ${issue.title}: ${issue.detail}`, 515);
+        y = ensureSpace(doc, y, line.length * 11 + 4);
+        doc.text(line, margin, y);
+        y += line.length * 11 + 4;
       }
       y += 6;
     }

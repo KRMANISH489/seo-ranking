@@ -50,17 +50,18 @@ function keywordIssuesFromReport(result: ReturnType<typeof analyzeKeywords>): Se
     });
   }
 
-  for (const stuffed of result.stuffedKeywords.slice(0, 4)) {
+  result.stuffedKeywords.slice(0, 4).forEach((stuffed, idx) => {
     issues.push({
       id: `kw-stuff-${stuffed.keyword}`,
       category: "Content",
-      severity: "critical",
+      // Only the worst stuffing is critical; rest are warnings (avoids Content score collapsing to 0)
+      severity: idx === 0 && stuffed.density >= 5 ? "critical" : "warning",
       title: `Keyword stuffing: "${stuffed.keyword}"`,
       message: stuffed.reason,
       recommendation: stuffed.suggestion || "Reduce repetition and use synonyms.",
       currentValue: `density=${stuffed.density}%`,
     });
-  }
+  });
 
   if (result.suggestions[0]) {
     const s = result.suggestions[0];
@@ -140,7 +141,7 @@ export async function analyzeUrl(
     });
 
     keywords = mergeAiIntoKeywords(keywords, ai);
-    issues = [...issues, ...aiIssues(ai)];
+    issues = [...issues, ...aiIssues(ai, issues)];
     ({ overallScore, grade, categoryScores, summary } = computeScores(issues));
 
     if (ai.enabled && !ai.error && ai.strategistSummary) {
