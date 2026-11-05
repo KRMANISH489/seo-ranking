@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import { AppNav } from "@/components/AppNav";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -15,7 +15,7 @@ const sora = Sora({
   subsets: ["latin"],
 });
 
-const title = "CodAbhi SEO — Weekly Reports & Google Rank Monitoring";
+const title = SITE_TITLE;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -26,13 +26,12 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   keywords: [
-    "automated SEO audit tool",
-    "weekly SEO rank tracker",
-    "weekly reports",
-    "white label SEO client reports",
+    "agency SEO rank tracker",
+    "white label client reports",
+    "live Google position tracking",
     "agency rank monitoring software",
-    "continuous SEO monitoring",
-    "live Google position tracking tool",
+    "automated client reports",
+    "Local SEO GMB audit",
   ],
   authors: [{ name: "CodAbhi", url: "https://codabhi-dev.vercel.app/" }],
   creator: "CodAbhi",
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "CodAbhi SEO — automated SEO audit tool and weekly Google rank reports",
+        alt: "CodAbhi agency SEO rank tracker with scheduled client reports",
       },
     ],
   },
@@ -109,12 +108,12 @@ const jsonLd = {
         priceCurrency: "USD",
       },
       featureList: [
-        "Automated SEO audit tool",
+        "Agency SEO rank tracker",
         "Live Google position tracking",
-        "Weekly client SEO reports",
-        "White label SEO client reports",
-        "Continuous SEO monitoring",
+        "White-label scheduled client reports",
+        "Local SEO / Google Business Profile checks",
         "PageSpeed and broken link checks",
+        "Admin traffic-light client health",
       ],
       provider: { "@id": `${SITE_URL}/#organization` },
     },
@@ -124,26 +123,34 @@ const jsonLd = {
       mainEntity: [
         {
           "@type": "Question",
-          name: "What does CodAbhi SEO automate?",
+          name: "What is CodAbhi’s agency SEO rank tracker?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "CodAbhi SEO is an automated SEO audit tool that checks on-page health, tracks live Google keyword rankings, and sends weekly reports to your client inbox with continuous SEO monitoring.",
+            text: "CodAbhi audits a client site, checks live Google positions for target keywords, reviews Local/GMB signals when provided, and saves the URL for scheduled follow-up reports.",
           },
         },
         {
           "@type": "Question",
-          name: "Can agencies send white label SEO client reports?",
+          name: "Can agencies send white-label client reports?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes. Agencies use CodAbhi for white label SEO client reports, scheduled SEO audit reports, and agency rank monitoring software workflows without rebuilding decks every week.",
+            text: "Yes. Each run can email a PDF with scores, keyword movement, prioritized fixes, and CodAbhi branding so retainers stay transparent without rebuilding decks by hand.",
           },
         },
         {
           "@type": "Question",
-          name: "How often are weekly reports sent?",
+          name: "How does scheduled monitoring work?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "When monitoring is enabled, CodAbhi runs audits and emails weekly reports every week so clients see SERP rank improvement progress without manual follow-up.",
+            text: "After the first audit with monitoring enabled, CodAbhi stores the client URL and re-checks on a weekly cadence. Admins see green, yellow, or red health based on the latest score and rank.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Does it cover Google Business Profile / Local search?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes. Add a business name plus city or a Maps link to pull listing signals such as NAP match, rating, reviews, and category gaps into the same audit report.",
           },
         },
       ],

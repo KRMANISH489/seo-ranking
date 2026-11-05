@@ -6,5 +6,8 @@ export const SITE_URL =
 
 export const SITE_NAME = "CodAbhi SEO";
 
+/** Keep under ~155 chars for SERP snippets */
 export const SITE_DESCRIPTION =
-  "Automated SEO audit tool with live Google position tracking, weekly reports, white label SEO client reports, and continuous SEO monitoring for agencies seeking SERP rank improvement.";
+  "Agency SEO rank tracker with live Google positions, technical audits, Local/GMB checks, and white-label client reports on a schedule.";
+
+export const SITE_TITLE = "Agency SEO Rank Tracker & Client Reports | CodAbhi";

@@ -10,18 +10,37 @@ import type { ProAuditResult } from "@/lib/seo/proTypes";
 const workflow = [
   {
     step: "01",
-    title: "Audit the client site",
-    body: "On-page health, technical warnings, PageSpeed, and broken links in one automated SEO audit tool run.",
+    title: "Run the first client check",
+    body: "Capture on-page health, technical warnings, PageSpeed, broken links, and Local/GMB signals in one pass.",
   },
   {
     step: "02",
-    title: "Track live Google rank",
-    body: "See exact SERP placement for target keywords with a weekly SEO rank tracker built for agencies.",
+    title: "Track live Google positions",
+    body: "See exact SERP placement for the keywords you care about — plus competitor leaders when a term is missing.",
   },
   {
     step: "03",
-    title: "Send weekly reports",
-    body: "White label SEO client reports land in the client inbox every week with continuous SEO monitoring.",
+    title: "Keep the URL on schedule",
+    body: "CodAbhi saves the client site, re-checks on a weekly cadence, and emails a white-label PDF until you pause.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Who is this for?",
+    a: "Agencies, freelancers, and in-house growth teams that need an agency SEO rank tracker plus clear client-facing reports without living in spreadsheets.",
+  },
+  {
+    q: "What gets emailed to the client?",
+    a: "A branded PDF with score, category breakdown, keyword plan, prioritized fixes, PageSpeed snapshot, and Local/GMB notes when those modules are enabled.",
+  },
+  {
+    q: "How is this different from Looker Studio?",
+    a: "You are not stitching Search Console tabs by hand. One form run audits, ranks, and delivery — then scheduled monitoring keeps the same URL warm for the next retainer cycle.",
+  },
+  {
+    q: "Can I track Google Business Profile?",
+    a: "Yes. Add business name + city or a Maps share link. We match the listing to the audited website when possible and flag NAP, category, and review gaps.",
   },
 ];
 
@@ -33,7 +52,7 @@ function ScorePanel() {
 
       <div className="relative flex items-center justify-between">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--muted)] sm:text-xs">
-          SEO health
+          Site health
         </p>
         <span className="rounded-full bg-[rgba(0,194,168,0.12)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--accent-2)]">
           Live
@@ -71,7 +90,7 @@ function ScorePanel() {
       <div className="relative mt-5 space-y-3 sm:mt-6">
         {[
           ["Keyword rank", "#4 · page 1", "text-[var(--accent)]"],
-          ["Weekly reports", "ON", "text-[var(--accent-2)]"],
+          ["Scheduled reports", "ON", "text-[var(--accent-2)]"],
           ["Monitoring", "Continuous", "text-[var(--text)]"],
         ].map(([label, value, color]) => (
           <div
@@ -126,17 +145,17 @@ export default function Home() {
 
             <p className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)] shadow-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-2)]" />
-              New · Automated SEO suite
+              Agency rank tracker
             </p>
 
-            <h1 className="mt-4 max-w-xl font-display text-[2.15rem] font-bold leading-[1.08] tracking-[-0.04em] text-[var(--text)] sm:mt-5 sm:text-5xl lg:text-[3.4rem]">
-              Rank tracking &amp;{" "}
-              <span className="text-gradient">weekly reports</span> on autopilot
+            <h1 className="mt-4 max-w-xl font-display text-[2.05rem] font-bold leading-[1.08] tracking-[-0.04em] text-[var(--text)] sm:mt-5 sm:text-5xl lg:text-[3.15rem]">
+              Agency SEO rank tracker &amp;{" "}
+              <span className="text-gradient">client reports</span> on autopilot
             </h1>
 
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-[var(--muted)] sm:mt-5 sm:text-lg">
-              Modern SEO audit tool for agencies — live Google positions, white label client
-              reports, continuous monitoring without the spreadsheet grind.
+              Live Google positions, technical audits, Local/GMB checks, and white-label PDFs —
+              save each client URL once and keep monitoring on a schedule.
             </p>
 
             <div className="mt-6 max-w-xl sm:mt-8">
@@ -145,8 +164,8 @@ export default function Home() {
 
             <TrustStats />
             <p className="mt-3 max-w-xl text-xs text-[var(--muted)] sm:text-sm">
-              Trusted workflow for agencies — every audit saves a full PDF with errors, exact
-              solutions, keyword plan, and CodAbhi branding so clients take action with confidence.
+              Every run can email a full PDF with errors, exact fixes, keyword plan, and CodAbhi
+              branding so clients know what to do next.
             </p>
           </div>
 
@@ -161,7 +180,7 @@ export default function Home() {
           <div className="mt-6 animate-fade-up rounded-3xl border border-[var(--line)] bg-white p-6 text-center shadow-sm sm:p-8">
             <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
             <p className="font-display text-lg font-bold">Running full audit + Google rank…</p>
-            <p className="mt-1 text-sm text-[var(--muted)]">Live SERP · weekly reports · save monitor</p>
+            <p className="mt-1 text-sm text-[var(--muted)]">Live SERP · reports · save monitor</p>
           </div>
         )}
 
@@ -177,11 +196,11 @@ export default function Home() {
           <>
             <section className="mt-4 rounded-3xl border border-[var(--line)] bg-white p-6 shadow-sm sm:mt-6 sm:p-8">
               <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                How continuous SEO monitoring works
+                How the agency SEO rank tracker works
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-[var(--muted)] sm:text-base">
-                One workflow from first audit to weekly client SEO reports — agency rank monitoring
-                software, not a one-off checklist.
+                One workflow from first audit to scheduled client delivery — built as rank
+                monitoring software for retainers, not a one-off checklist.
               </p>
               <ol className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {workflow.map((item) => (
@@ -199,24 +218,29 @@ export default function Home() {
             <section className="mt-10 grid items-center gap-8 sm:mt-14 lg:grid-cols-2">
               <div>
                 <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                  Why agencies automate weekly reports
+                  Why teams automate client reporting
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                  Manual decks waste billable hours. CodAbhi combines an automated SEO audit tool,
-                  weekly SEO rank tracker checks, PageSpeed insights, and broken-link scanning so
-                  your team focuses on SERP rank improvement while scheduled SEO audit reports keep
-                  clients informed.
+                  Manual decks burn billable hours. CodAbhi combines technical audits, live
+                  position checks, PageSpeed, crawl depth, and broken-link sampling so your team
+                  focuses on fixes that move search visibility.
                 </p>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                  Run the audit, email the client, and keep continuous SEO monitoring running from
-                  the agency dashboard until the engagement wraps.
+                  Admins see green / yellow / red health per saved client. Pause anytime from the
+                  dashboard when an engagement ends.
                 </p>
+                <ul className="mt-5 space-y-2 text-sm text-[var(--muted)]">
+                  <li>• Crawl up to several internal pages per run</li>
+                  <li>• Optional PageSpeed lab metrics (Core Web Vitals)</li>
+                  <li>• Local / GMB listing match when you provide name + city or Maps link</li>
+                  <li>• PDF export + inbox delivery for client and agency</li>
+                </ul>
               </div>
               <div className="relative overflow-hidden rounded-3xl border border-[var(--line)] bg-white shadow-sm">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/seo-dashboard.jpg"
-                  alt="CodAbhi SEO automated audit dashboard with weekly Google rank monitoring and client report delivery"
+                  alt="CodAbhi agency dashboard showing audit scores and scheduled client report delivery"
                   width={960}
                   height={540}
                   className="h-auto w-full"
@@ -227,34 +251,65 @@ export default function Home() {
 
             <section className="mt-10 max-w-3xl sm:mt-14">
               <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                Automated client SEO reports that scale
+                White-label reports that scale retainers
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                Freelancers and agencies need white label SEO client reports without a design
-                sprint. CodAbhi packages score summaries, keyword movement, and prioritized fixes
-                into email-ready weekly reports — paired with a live Google position tracking tool.
+                Freelancers and agencies need rebrandable deliverables without a design sprint.
+                CodAbhi packages score summaries, keyword movement, Local listing notes, and a
+                prioritized action board into email-ready PDFs — paired with live Google position
+                tracking.
               </p>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                Use it as your weekly SEO rank tracker for retainers, competitive reviews, or
-                onboarding audits. Enable crawl, PageSpeed, and broken-link modules when you want
-                deeper coverage, then let continuous SEO monitoring send the next round alongside
-                ranking updates.
+                Compared with stitching Search Console or Looker Studio tabs, you get a single
+                audit → rank → report loop. Sample the PDF after any run, then keep the same
+                domain on the monitoring list for the next cycle.
               </p>
             </section>
 
             <section className="mt-10 max-w-3xl sm:mt-14">
               <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                Built for SERP rank improvement
+                Local search and GMB in the same pass
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                Teams that track Google keyword rankings weekly spot regressions early and show
-                clients a transparent timeline. CodAbhi surfaces actionable findings — not vanity
-                scores — so your next sprint targets the issues most likely to move positions.
+                Many agency clients live or die on Maps. When you add a business name with city —
+                or paste a Google Maps / GBP share link — CodAbhi looks up listing signals such as
+                website match, phone/NAP consistency, category, rating, and review count, then folds
+                those findings into the same priority plan.
               </p>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                Start with one URL today. Turn on weekly reports and treat CodAbhi as the automated
-                SEO monitoring platform beside your content calendar and outreach pipeline.
+                If no listing matches the audited website, we say so clearly instead of attaching
+                an unrelated place. That keeps Local notes trustworthy for client conversations.
               </p>
+            </section>
+
+            <section className="mt-10 max-w-3xl sm:mt-14">
+              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                Plans that fit how agencies work
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+                Start free on the public form: one URL, client email, optional keywords and GMB
+                fields. Monitoring stores domains for scheduled re-checks. Agency ops use the admin
+                panel for traffic-light health, pause/resume, and “run now” when a client asks for
+                an update between cycles.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+                Crawl depth, PageSpeed, and broken-link modules are toggles — turn them on when the
+                engagement needs deeper coverage, keep them light for fast onboarding audits.
+              </p>
+            </section>
+
+            <section className="mt-10 rounded-3xl border border-[var(--line)] bg-white p-6 shadow-sm sm:mt-14 sm:p-8">
+              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                Frequently asked questions
+              </h2>
+              <div className="mt-6 space-y-5">
+                {faqs.map((item) => (
+                  <div key={item.q} className="border-t border-[var(--line)] pt-5 first:border-0 first:pt-0">
+                    <h3 className="font-display text-lg font-bold">{item.q}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{item.a}</p>
+                  </div>
+                ))}
+              </div>
             </section>
           </>
         )}
