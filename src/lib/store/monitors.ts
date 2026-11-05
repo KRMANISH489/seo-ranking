@@ -14,6 +14,9 @@ export interface MonitorSite {
   lastAuditId: string | null;
   lastScore: number | null;
   lastBestRank: number | null;
+  /** Prior score before latest run — for admin trend arrows */
+  previousScore?: number | null;
+  previousBestRank?: number | null;
   weeklyReportsSent: number;
   notes?: string;
 }
@@ -82,6 +85,8 @@ export async function upsertMonitor(input: {
     lastAuditId: null,
     lastScore: null,
     lastBestRank: null,
+    previousScore: null,
+    previousBestRank: null,
     weeklyReportsSent: 0,
     notes: input.notes,
   };
@@ -113,6 +118,8 @@ export async function updateMonitorRun(
   const all = await readAll();
   const m = all.find((x) => x.id === id);
   if (!m) return;
+  m.previousScore = m.lastScore;
+  m.previousBestRank = m.lastBestRank;
   m.lastRunAt = new Date().toISOString();
   m.lastAuditId = patch.lastAuditId;
   m.lastScore = patch.lastScore;
