@@ -369,6 +369,51 @@ export async function buildAuditPdf(audit: ProAuditResult): Promise<Buffer> {
     y += 8;
   }
 
+  // Local SEO / GMB
+  if (audit.localSeo?.enabled) {
+    y = ensureSpace(doc, y, 110);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(...BRAND.ink);
+    doc.text("Local SEO / Google Business Profile", margin, y);
+    y += 14;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...BRAND.muted);
+
+    if (audit.localSeo.error) {
+      doc.text(audit.localSeo.error.slice(0, 110), margin, y);
+      y += 14;
+    } else if (audit.localSeo.listing) {
+      const L = audit.localSeo.listing;
+      doc.text(
+        `${L.name || "Listing"} · Score ${audit.localSeo.score ?? "—"} (${audit.localSeo.grade ?? "—"}) · Rating ${L.rating ?? "—"} (${L.reviewCount ?? 0} reviews)`,
+        margin,
+        y
+      );
+      y += 12;
+      if (L.address) {
+        doc.text(`Address: ${L.address}`.slice(0, 110), margin, y);
+        y += 12;
+      }
+      doc.text(
+        `Phone: ${L.phone || "—"} · Website: ${L.website || "missing"} · Category: ${L.category || "—"}`,
+        margin,
+        y
+      );
+      y += 14;
+      const localIssues = audit.localSeo.issues.filter(
+        (i) => i.severity === "critical" || i.severity === "warning"
+      );
+      for (const issue of localIssues.slice(0, 6)) {
+        y = ensureSpace(doc, y, 20);
+        doc.text(`• ${issue.title}: ${issue.detail}`.slice(0, 110), margin, y);
+        y += 12;
+      }
+      y += 6;
+    }
+  }
+
   // PageSpeed + crawl + broken links (compact)
   y = ensureSpace(doc, y, 100);
   doc.setFont("helvetica", "bold");

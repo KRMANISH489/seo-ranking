@@ -3,6 +3,7 @@ import { getAdminSession } from "@/lib/admin/auth";
 import { getStorageMode, listAudits } from "@/lib/store/audits";
 import { listMonitors } from "@/lib/store/monitors";
 import { emailStatus } from "@/lib/email/sendReport";
+import { healthCounts } from "@/lib/monitoring/health";
 
 export async function GET() {
   const session = await getAdminSession();
@@ -42,6 +43,7 @@ export async function GET() {
         },
         recentAudits: audits.slice(0, 8),
         recentMonitors: monitors.slice(0, 8),
+        health: healthCounts(monitors),
         system: {
           ...emailStatus(),
           storage: getStorageMode(),

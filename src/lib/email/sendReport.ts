@@ -209,6 +209,30 @@ function buildHtml(opts: {
       </div>
     </div>
 
+    ${
+      audit.localSeo?.enabled && audit.localSeo.listing
+        ? `<div style="background:#ffffff;border:1px solid #d7e6f7;border-radius:12px;padding:16px;margin:16px 0;">
+      <div style="font-size:12px;color:#5b6b7c;text-transform:uppercase;letter-spacing:0.08em;">Local SEO / GMB</div>
+      <div style="font-size:18px;font-weight:700;margin-top:6px;color:#0b1220;">${escapeHtml(audit.localSeo.listing.name || "Business listing")}</div>
+      <p style="color:#5b6b7c;font-size:13px;margin:6px 0 0;">
+        Score ${audit.localSeo.score ?? "—"} (${escapeHtml(audit.localSeo.grade || "—")}) ·
+        Rating ${audit.localSeo.listing.rating ?? "—"} ·
+        Reviews ${audit.localSeo.listing.reviewCount ?? 0}
+      </p>
+      <p style="color:#334155;font-size:13px;margin:8px 0 0;">${escapeHtml(audit.localSeo.listing.address || "")}</p>
+      ${
+        audit.localSeo.issues.filter((i) => i.severity === "critical" || i.severity === "warning").length
+          ? `<ul style="margin:10px 0 0;padding-left:18px;color:#334155;font-size:13px;line-height:1.5;">${audit.localSeo.issues
+              .filter((i) => i.severity === "critical" || i.severity === "warning")
+              .slice(0, 4)
+              .map((i) => `<li><strong>${escapeHtml(i.title)}</strong> — ${escapeHtml(i.detail)}</li>`)
+              .join("")}</ul>`
+          : ""
+      }
+    </div>`
+        : ""
+    }
+
     <h2 style="font-size:18px;margin-top:24px;color:#0b1220;">Keyword ranks</h2>
     <div style="background:#fff;color:#0f172a;border-radius:12px;padding:8px;overflow:auto;border:1px solid #d7e6f7;">
       ${rankRows(audit.ranking)}

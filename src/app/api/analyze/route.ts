@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { proAnalyzeUrl } from "@/lib/seo/proAnalyze";
 import { saveAudit } from "@/lib/store/audits";
-import { upsertMonitor } from "@/lib/store/monitors";
+import { updateMonitorRun, upsertMonitor } from "@/lib/store/monitors";
 import { sendAuditEmails } from "@/lib/email/sendReport";
 
 function isValidEmail(email: string) {
@@ -42,6 +42,10 @@ export async function POST(req: NextRequest) {
     const pageSpeed = body?.pageSpeed !== false;
     const checkBrokenLinks = body?.checkBrokenLinks !== false;
     const checkRank = body?.checkRank !== false;
+    const localSeo = body?.localSeo !== false;
+    const businessQuery =
+      typeof body?.businessQuery === "string" ? body.businessQuery.trim() : "";
+    const gbpUrl = typeof body?.gbpUrl === "string" ? body.gbpUrl.trim() : "";
     const weeklyMonitor = body?.weeklyMonitor !== false;
     const maxCrawlPages = Math.min(Number(body?.maxCrawlPages) || 5, 8);
     const save = body?.save !== false;
@@ -54,6 +58,9 @@ export async function POST(req: NextRequest) {
       maxCrawlPages,
       keywords,
       checkRank,
+      localSeo,
+      businessQuery: businessQuery || null,
+      gbpUrl: gbpUrl || null,
     });
 
     result.clientEmail = clientEmail;
@@ -78,6 +85,20 @@ export async function POST(req: NextRequest) {
     }
 
     const saved = save ? await saveAudit(result) : result;
+
+    // Seed admin traffic-light status from the first client check
+    if (monitorId && saved.id) {
+      try {
+        await updateMonitorRun(monitorId, {
+          lastAuditId: saved.id,
+          lastScore: saved.overallScore,
+          lastBestRank: saved.ranking?.bestPosition ?? null,
+          countWeeklyEmail: false,
+        });
+      } catch {
+        // ignore — audit itself already persisted
+      }
+    }
 
     if (sendEmail) {
       saved.emailDelivery = await sendAuditEmails({

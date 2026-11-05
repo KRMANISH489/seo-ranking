@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AdminGate } from "@/components/admin/AdminGate";
+import { HealthBadge } from "@/components/admin/HealthBadge";
+import { healthStyles } from "@/lib/monitoring/health";
 import type { AuditListItem } from "@/lib/seo/proTypes";
 import type { MonitorSite } from "@/lib/store/monitors";
 
@@ -18,6 +20,7 @@ type Stats = {
   };
   recentAudits: AuditListItem[];
   recentMonitors: MonitorSite[];
+  health?: { green: number; yellow: number; red: number; gray: number };
   system: {
     smtpConfigured: boolean;
     adminEmail: string | null;
@@ -102,6 +105,27 @@ function DashboardInner() {
         ))}
       </div>
 
+      {stats.health ? (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {(
+            [
+              ["green", "Good", stats.health.green],
+              ["yellow", "Watch", stats.health.yellow],
+              ["red", "Needs work", stats.health.red],
+              ["gray", "Pending", stats.health.gray],
+            ] as const
+          ).map(([key, label, value]) => (
+            <div key={key} className={`rounded-2xl border p-4 ${healthStyles[key].card}`}>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
+                <span className={`h-2.5 w-2.5 rounded-full ${healthStyles[key].dot}`} />
+                {label}
+              </div>
+              <div className="mt-1 font-display text-2xl font-semibold">{value}</div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="glass rounded-xl p-4 text-sm">
           Storage: {stats.system.storage === "blob" ? "Blob (persistent)" : "Ephemeral"}
@@ -170,13 +194,13 @@ function DashboardInner() {
             )}
             {stats.recentMonitors.map((m) => (
               <li key={m.id} className="border-t border-[var(--line)] pt-3 first:border-0 first:pt-0">
-                <div className="flex justify-between gap-2">
-                  <span className="truncate font-medium">{m.clientEmail}</span>
-                  <span className={m.active ? "text-emerald-300" : "text-slate-400"}>
-                    {m.active ? "Active" : "Paused"}
-                  </span>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <span className="truncate font-medium">{m.clientEmail}</span>
+                    <p className="truncate text-xs text-[var(--muted)]">{m.url}</p>
+                  </div>
+                  <HealthBadge monitor={m} />
                 </div>
-                <p className="truncate text-xs text-[var(--muted)]">{m.url}</p>
               </li>
             ))}
           </ul>

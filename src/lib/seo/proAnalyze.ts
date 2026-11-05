@@ -12,9 +12,11 @@ import {
   type SiteCrawlReport,
   type PageSpeedMetrics,
   type BrokenLink,
+  type LocalSeoReport,
 } from "./proTypes";
 import { extractLinks } from "./analyzeOnPage";
 import { buildRankingReport, rankingSpeedTips } from "./googleRank";
+import { buildLocalSeoReport } from "./localSeo";
 
 export interface ProAnalyzeOptions {
   deepCrawl?: boolean;
@@ -24,6 +26,9 @@ export interface ProAnalyzeOptions {
   skipAi?: boolean;
   keywords?: string[];
   checkRank?: boolean;
+  localSeo?: boolean;
+  businessQuery?: string | null;
+  gbpUrl?: string | null;
 }
 
 export async function proAnalyzeUrl(
@@ -34,6 +39,7 @@ export async function proAnalyzeUrl(
   const wantPsi = options.pageSpeed !== false;
   const wantBroken = options.checkBrokenLinks !== false;
   const wantRank = options.checkRank !== false;
+  const wantLocal = options.localSeo !== false;
   const maxCrawlPages = options.maxCrawlPages ?? 5;
 
   // Seed HTML for crawl + link checks (one fetch)
@@ -88,11 +94,31 @@ export async function proAnalyzeUrl(
     ? buildRankingReport(result.url, keywordSeeds)
     : Promise.resolve(undefined);
 
-  const [crawl, pageSpeed, brokenLinks, ranking] = await Promise.all([
+  const localSeoPromise: Promise<LocalSeoReport> = wantLocal
+    ? buildLocalSeoReport({
+        enabled: true,
+        businessQuery: options.businessQuery,
+        gbpUrl: options.gbpUrl,
+        siteUrl: result.url,
+        pageText: result.pageTextPreview,
+      })
+    : Promise.resolve({
+        enabled: false,
+        error: null,
+        query: null,
+        score: null,
+        grade: null,
+        listing: null,
+        issues: [],
+        napMatch: { websiteMatch: null, phoneFoundOnSite: null, notes: [] },
+      });
+
+  const [crawl, pageSpeed, brokenLinks, ranking, localSeo] = await Promise.all([
     crawlPromise,
     psiPromise,
     brokenPromise,
     rankingPromise,
+    localSeoPromise,
   ]);
 
   const brokenOnly = brokenLinks.filter((b) => !b.ok);
@@ -100,6 +126,7 @@ export async function proAnalyzeUrl(
   const priorityActions = buildPriorityActions(result, {
     brokenCount: brokenOnly.length,
     pageSpeedPerf: pageSpeed.performance,
+    localSeo,
   });
 
   if (ranking) {
@@ -123,11 +150,13 @@ export async function proAnalyzeUrl(
     brokenLinks,
     pageSpeed,
     crawl,
+    localSeo,
     ranking,
     options: {
       deepCrawl,
       pageSpeed: wantPsi,
       checkBrokenLinks: wantBroken,
+      localSeo: wantLocal,
     },
   };
 }

@@ -106,6 +106,8 @@ export async function updateMonitorRun(
     lastAuditId: string;
     lastScore: number;
     lastBestRank: number | null;
+    /** First public audit should not inflate weekly email counter */
+    countWeeklyEmail?: boolean;
   }
 ): Promise<void> {
   const all = await readAll();
@@ -115,7 +117,9 @@ export async function updateMonitorRun(
   m.lastAuditId = patch.lastAuditId;
   m.lastScore = patch.lastScore;
   m.lastBestRank = patch.lastBestRank;
-  m.weeklyReportsSent += 1;
+  if (patch.countWeeklyEmail !== false) {
+    m.weeklyReportsSent += 1;
+  }
   m.updatedAt = m.lastRunAt;
   await writeAll(all);
 }

@@ -7,10 +7,13 @@ export type AnalyzeOptionsInput = {
   pageSpeed: boolean;
   checkBrokenLinks: boolean;
   checkRank: boolean;
+  localSeo: boolean;
   weeklyMonitor: boolean;
   clientEmail: string;
   clientName: string;
   keywords: string;
+  businessQuery: string;
+  gbpUrl: string;
 };
 
 export function AnalyzerForm({
@@ -24,10 +27,13 @@ export function AnalyzerForm({
   const [clientEmail, setClientEmail] = useState("");
   const [clientName, setClientName] = useState("");
   const [keywords, setKeywords] = useState("");
+  const [businessQuery, setBusinessQuery] = useState("");
+  const [gbpUrl, setGbpUrl] = useState("");
   const [deepCrawl, setDeepCrawl] = useState(true);
   const [pageSpeed, setPageSpeed] = useState(true);
   const [checkBrokenLinks, setCheckBrokenLinks] = useState(true);
   const [checkRank, setCheckRank] = useState(true);
+  const [localSeo, setLocalSeo] = useState(true);
   const [weeklyMonitor, setWeeklyMonitor] = useState(true);
 
   function options(): AnalyzeOptionsInput {
@@ -36,10 +42,13 @@ export function AnalyzerForm({
       pageSpeed,
       checkBrokenLinks,
       checkRank,
+      localSeo,
       weeklyMonitor,
       clientEmail: clientEmail.trim(),
       clientName: clientName.trim(),
       keywords: keywords.trim(),
+      businessQuery: businessQuery.trim(),
+      gbpUrl: gbpUrl.trim(),
     };
   }
 
@@ -60,7 +69,7 @@ export function AnalyzerForm({
             Run client SEO audit
           </p>
           <p className="mt-1 text-xs text-[var(--muted)]">
-            URL + email → live Google rank + weekly reports
+            URL + email → rank, Local SEO / GMB, weekly reports
           </p>
         </div>
         <span className="rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
@@ -110,6 +119,22 @@ export function AnalyzerForm({
           className="input-seo md:col-span-2"
           disabled={loading}
         />
+        <input
+          type="text"
+          value={businessQuery}
+          onChange={(e) => setBusinessQuery(e.target.value)}
+          placeholder="GMB / business name + city (e.g. CodAbhi Patna)"
+          className="input-seo"
+          disabled={loading}
+        />
+        <input
+          type="text"
+          value={gbpUrl}
+          onChange={(e) => setGbpUrl(e.target.value)}
+          placeholder="Google Maps / GBP link (optional)"
+          className="input-seo"
+          disabled={loading}
+        />
       </div>
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -120,7 +145,15 @@ export function AnalyzerForm({
               checked={weeklyMonitor}
               onChange={(e) => setWeeklyMonitor(e.target.checked)}
             />
-            Weekly reports
+            Save URL + weekly auto-check
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={localSeo}
+              onChange={(e) => setLocalSeo(e.target.checked)}
+            />
+            Local SEO / GMB
           </label>
           <label className="flex items-center gap-2">
             <input

@@ -27,6 +27,8 @@ export async function runMonitorOnce(monitor: MonitorSite): Promise<WeeklyRunRes
       maxCrawlPages: 4,
       keywords: monitor.keywords,
       checkRank: true,
+      localSeo: true,
+      businessQuery: monitor.clientName || null,
     });
 
     audit.clientEmail = monitor.clientEmail;

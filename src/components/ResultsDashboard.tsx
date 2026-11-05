@@ -289,6 +289,90 @@ export function ResultsDashboard({ result }: { result: ProAuditResult }) {
         <PriorityBoard actions={result.priorityActions} />
       </Section>
 
+      {result.localSeo?.enabled ? (
+        <Section
+          title="Local SEO / Google Business Profile"
+          subtitle={
+            result.localSeo.error
+              ? "GBP lookup status."
+              : `Maps listing snapshot${result.localSeo.query ? ` for “${result.localSeo.query}”` : ""}.`
+          }
+        >
+          {result.localSeo.error ? (
+            <p className="text-sm text-amber-800">{result.localSeo.error}</p>
+          ) : result.localSeo.listing ? (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="font-display text-xl font-bold text-[var(--text)]">
+                    {result.localSeo.listing.name || "Business listing"}
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--muted)]">
+                    {result.localSeo.listing.category || "Uncategorized"}
+                    {result.localSeo.listing.address ? ` · ${result.localSeo.listing.address}` : ""}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="font-display text-3xl font-semibold text-[var(--accent)]">
+                    {result.localSeo.score ?? "—"}
+                  </div>
+                  <div className="text-xs uppercase tracking-wider text-[var(--muted)]">
+                    Local grade {result.localSeo.grade ?? "—"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 text-sm">
+                <div className="rounded-xl border border-[var(--line)] p-3">
+                  Rating: {result.localSeo.listing.rating ?? "—"}
+                </div>
+                <div className="rounded-xl border border-[var(--line)] p-3">
+                  Reviews: {result.localSeo.listing.reviewCount ?? "—"}
+                </div>
+                <div className="rounded-xl border border-[var(--line)] p-3">
+                  Phone: {result.localSeo.listing.phone || "—"}
+                </div>
+                <div className="rounded-xl border border-[var(--line)] p-3">
+                  Website:{" "}
+                  {result.localSeo.listing.website
+                    ? result.localSeo.napMatch.websiteMatch
+                      ? "Matched"
+                      : "Mismatch / other"
+                    : "Missing"}
+                </div>
+              </div>
+
+              {result.localSeo.issues.length > 0 ? (
+                <ul className="space-y-2 text-sm">
+                  {result.localSeo.issues.map((issue) => (
+                    <li
+                      key={issue.id}
+                      className="rounded-xl border border-[var(--line)] bg-[var(--bg)] px-3 py-2"
+                    >
+                      <span className="font-semibold text-[var(--text)]">{issue.title}</span>
+                      <span className="mt-0.5 block text-[var(--muted)]">{issue.detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
+              {result.localSeo.listing.mapsUrl ? (
+                <a
+                  href={result.localSeo.listing.mapsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-block text-sm text-[var(--accent)] hover:underline"
+                >
+                  Open listing on Google Maps →
+                </a>
+              ) : null}
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--muted)]">No listing data.</p>
+          )}
+        </Section>
+      ) : null}
+
       <Section
         title="Core Web Vitals & PageSpeed"
         subtitle={

@@ -64,6 +64,44 @@ export interface SiteCrawlReport {
   pages: CrawledPageSummary[];
 }
 
+export interface LocalSeoIssue {
+  id: string;
+  severity: "critical" | "warning" | "info" | "pass";
+  title: string;
+  detail: string;
+}
+
+export interface LocalSeoListing {
+  name: string | null;
+  address: string | null;
+  phone: string | null;
+  website: string | null;
+  rating: number | null;
+  reviewCount: number | null;
+  category: string | null;
+  categories: string[];
+  mapsUrl: string | null;
+  placeId: string | null;
+  cid: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface LocalSeoReport {
+  enabled: boolean;
+  error: string | null;
+  query: string | null;
+  score: number | null;
+  grade: string | null;
+  listing: LocalSeoListing | null;
+  issues: LocalSeoIssue[];
+  napMatch: {
+    websiteMatch: boolean | null;
+    phoneFoundOnSite: boolean | null;
+    notes: string[];
+  };
+}
+
 export interface ProAuditExtras {
   id: string;
   serp: SerpPreview;
@@ -71,6 +109,7 @@ export interface ProAuditExtras {
   brokenLinks: BrokenLink[];
   pageSpeed: PageSpeedMetrics;
   crawl: SiteCrawlReport;
+  localSeo: LocalSeoReport;
   ranking?: RankingReport;
   clientEmail?: string | null;
   monitorId?: string | null;
@@ -83,6 +122,7 @@ export interface ProAuditExtras {
     deepCrawl: boolean;
     pageSpeed: boolean;
     checkBrokenLinks: boolean;
+    localSeo: boolean;
   };
 }
 
@@ -140,7 +180,11 @@ export function buildSerpPreview(result: SeoAnalysisResult): SerpPreview {
 
 export function buildPriorityActions(
   result: SeoAnalysisResult,
-  extras?: { brokenCount?: number; pageSpeedPerf?: number | null }
+  extras?: {
+    brokenCount?: number;
+    pageSpeedPerf?: number | null;
+    localSeo?: LocalSeoReport | null;
+  }
 ): PriorityAction[] {
   const actions: PriorityAction[] = [];
   const critical = result.issues.filter((i) => i.severity === "critical");
@@ -198,6 +242,18 @@ export function buildPriorityActions(
       detail: "Optimize LCP images, reduce JS, improve TTFB via CDN/caching.",
       category: "Performance",
       impact: "high",
+    });
+  }
+
+  const localIssues = extras?.localSeo?.issues?.filter((i) => i.severity === "critical" || i.severity === "warning") || [];
+  for (const issue of localIssues.slice(0, 4)) {
+    actions.push({
+      id: `local-${issue.id}`,
+      level: issue.severity === "critical" ? "P0" : "P1",
+      title: issue.title,
+      detail: issue.detail,
+      category: "Local SEO / GMB",
+      impact: issue.severity === "critical" ? "high" : "medium",
     });
   }
 
