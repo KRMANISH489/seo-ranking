@@ -45,11 +45,11 @@ export default function OpenGraphImage() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ display: "flex", fontSize: 52, fontWeight: 800, lineHeight: 1.12, maxWidth: 980 }}>
-            Rank tracking & weekly reports on autopilot
+            Agency SEO rank tracker & client reports
           </div>
           <div style={{ display: "flex", fontSize: 24, color: "#5b6b7c", maxWidth: 900 }}>
-            Automated SEO audit tool for agencies — white label client reports and SERP rank
-            improvement.
+            Live Google positions, technical audits, Local/GMB checks, and white-label PDFs for
+            agencies.
           </div>
         </div>
       </div>
